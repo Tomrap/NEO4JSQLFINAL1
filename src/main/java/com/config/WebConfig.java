@@ -8,6 +8,7 @@ import org.springframework.web.servlet.config.annotation.DefaultServletHandlerCo
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
 /**
  * Created by John on 2017-01-15.
@@ -21,9 +22,8 @@ public class WebConfig
     public ViewResolver viewResolver() {
         InternalResourceViewResolver resolver =
                 new InternalResourceViewResolver();
-        resolver.setPrefix("/WEB-INF/views/");
+        resolver.setPrefix("/");
         resolver.setSuffix(".jsp");
-        resolver.setExposeContextBeansAsAttributes(true);
         return resolver;
     }
     @Override
