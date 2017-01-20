@@ -25,6 +25,38 @@
 	</properties>
 
 	<dependencies>
+
+		<!-- https://mvnrepository.com/artifact/com.oracle/ojdbc14
+
+		 local Dependency - need to install driver manually using maven
+		 https://www.mkyong.com/maven/how-to-add-oracle-jdbc-driver-in-your-maven-local-repository/
+
+		 note: Tomcat is using his own jdbc driver so it is not needed
+
+		 -->
+
+		<!-- https://mvnrepository.com/artifact/net.sourceforge.schemacrawler/schemacrawler -->
+		<dependency>
+			<groupId>net.sourceforge.schemacrawler</groupId>
+			<artifactId>schemacrawler</artifactId>
+			<version>10.10.05</version>
+		</dependency>
+
+		<!--for tests-->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc6</artifactId>
+			<version>11.2.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -32,7 +64,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Spring 3 dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
@@ -58,6 +89,7 @@
 			<artifactId>cglib</artifactId>
 			<version>2.2.2</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>

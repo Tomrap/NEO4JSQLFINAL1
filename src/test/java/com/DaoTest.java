@@ -1,6 +1,7 @@
 package com;
 
 import com.config.SpringConfig;
+import com.config.WebConfig;
 import com.controller.HomeController;
 import com.core.Dao;
 import org.junit.Assert;
@@ -9,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +20,8 @@ import java.util.Map;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes=SpringConfig.class)
+@ContextConfiguration(classes={SpringConfig.class, WebConfig.class})
+@WebAppConfiguration
 public class DaoTest {
 
     @Autowired

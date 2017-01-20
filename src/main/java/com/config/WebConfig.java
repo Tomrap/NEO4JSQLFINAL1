@@ -18,6 +18,7 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 @ComponentScan("com")
 public class WebConfig
         extends WebMvcConfigurerAdapter {
+
     @Bean
     public ViewResolver viewResolver() {
         InternalResourceViewResolver resolver =

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,6 @@ public class Dao {
             public Map<String, Object> mapRow(ResultSet resultSet, int i) throws SQLException {
                 Map<String, Object> map = new HashMap<>();
                 int numberOfCOlumns = resultSet.getMetaData().getColumnCount();
-//                resultSet.getMetaData().getColumnName()
                 for(int j = 1; j <numberOfCOlumns+1; j++) {
                     map.put(resultSet.getMetaData().getColumnName(j),resultSet.getObject(j));
                 }

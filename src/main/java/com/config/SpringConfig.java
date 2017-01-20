@@ -5,9 +5,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jndi.JndiTemplate;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 /**
@@ -21,6 +23,15 @@ import javax.sql.DataSource;
         @ComponentScan.Filter(type= FilterType.ANNOTATION, value=EnableWebMvc.class)
 })
 public class SpringConfig {
+
+    //TODO JNDI LOOKUP - PROBLEMS WITH TESTING, JNDI RESOURCE NOT AVAILABLE,ALREADY ADDED DATABASE RESOURCE TO TOMCAT CONTEXT.XML AND RESOURCE-LINK TO WEB.XML
+//    @Bean
+//    public DataSource getDataSource() throws NamingException {
+//        JndiTemplate jndiTemplate = new JndiTemplate();
+//        DataSource dataSource
+//                = (DataSource) jndiTemplate.lookup("java:comp/env/jdbc/sakila");
+//        return dataSource;
+//    }
 
     @Bean
     public DataSource dataSource() {
