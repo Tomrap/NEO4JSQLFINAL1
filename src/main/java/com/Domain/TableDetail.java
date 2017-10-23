@@ -18,19 +18,36 @@
  */
 package com.Domain;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class TableDetail {
 
-    public final String table;
-    public final List<String> pk;
-    public final List<String> fields;
-    public final Map<List<String>, String> fks;
+    public static final String schemaName = "hibernate";
 
-    public TableDetail(String table, List< String> pk, List<String> fields, Map<List<String>, String> fks) {
+    private final String table;
+
+    public String getTable() {
+        return table;
+    }
+
+    public List<String> getPk() {
+        return pk;
+    }
+
+    public List<String> getFields() {
+        return fields;
+    }
+
+    public Map<String, String> getFks() {
+        return fks;
+    }
+
+    private final List<String> pk;
+    private final List<String> fields;
+    private final Map<String, String> fks;
+
+    public TableDetail(String table, List< String> pk, List<String> fields, Map<String, String> fks) {
         this.table = table;
         this.pk = pk;
         this.fields = fields;

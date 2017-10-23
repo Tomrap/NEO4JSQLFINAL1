@@ -3,6 +3,7 @@ package com.dao;
 import com.config.SpringConfig;
 import com.config.WebConfig;
 import com.controller.HomeController;
+import com.service.MainService;
 import com.service.RDBReader;
 import org.junit.Assert;
 import org.junit.Test;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import schemacrawler.Main;
 import schemacrawler.schemacrawler.SchemaCrawlerException;
 
 import java.io.IOException;
@@ -31,6 +33,9 @@ public class DaoTest {
     private Dao dao;
 
     @Autowired
+    private MainService mainService;
+
+    @Autowired
     private RDBReader rdbReader;
 
     @Autowired
@@ -42,15 +47,13 @@ public class DaoTest {
 //        neo4JDao.createDb();
 
 
-        List<Map<String ,Object>> map =  dao.get();
-        System.out.println(map);
 
     }
 
     @Test
     public void rdbreaderTest() throws SQLException, SchemaCrawlerException {
 
-        rdbReader.extractTables();
+        mainService.main();
     }
 
 
