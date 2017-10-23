@@ -11,6 +11,7 @@ import schemacrawler.schemacrawler.SchemaCrawlerOptions;
 import schemacrawler.schemacrawler.SchemaInfoLevel;
 import schemacrawler.utility.SchemaCrawlerUtility;
 
+import javax.swing.*;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -41,24 +42,39 @@ public class RDBReader {
 
         final Database database = SchemaCrawlerUtility.getDatabase(dao.getJdbcTemplate().getDataSource().getConnection(), options);
 
-
         for (final Table table : database.getTables()) {
+
+            TableDetail tableDetail = new TableDetail();
+
             String tableName = table.getName();
+            tableDetail.setTableName(tableName);
+            tableDetail.setPk(getPriamryKeys(table));
+            tableDetail.setFks(getForeignKeys(table));
+            tableDetail.setFields(getColumns(table,tableDetail));
 
-            List<Column> columns = table.getColumns();
-
-            List<String> fields = new ArrayList<>(columns.size());
-
-            for (final Column column : columns) {
-//                    System.out.println("     o--> " + column + " pk: "+ column.isPartOfPrimaryKey() + " fk: " + column.isPartOfForeignKey());
-                String columnName = column.getName();
-                fields.add(columnName);
-            }
-
-            TableDetail tableDetail = new TableDetail(tableName, getPriamryKeys(table), fields, getForeignKeys(table));
             tableList.add(tableDetail);
         }
         return tableList;
+    }
+
+
+    private List<String> getColumns(Table table, TableDetail tableDetail) {
+
+        //without Foreign Keys and Primary Keys
+        List<Column> columns = table.getColumns();
+        Collection<String> fields = new ArrayList<>(columns.size());
+
+        //all
+        for (final Column column : columns) {
+            String columnName = column.getName();
+            fields.add(columnName);
+        }
+        //remove primary keys
+        fields.removeAll(tableDetail.getPk());
+        //remove foreign keys
+        fields.removeAll(tableDetail.getForeignKeyColumns());
+
+        return new ArrayList<>(fields);
     }
 
     private Map<String, String> getForeignKeys(Table table) {
@@ -83,6 +99,8 @@ public class RDBReader {
         }
         return fks;
     }
+
+
 
     private List<String> getPriamryKeys(Table table) {
         List<String> pks = new ArrayList<>();

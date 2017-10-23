@@ -2,12 +2,10 @@
 package com.dao;
 
 import com.Domain.TableDetail;
-import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -23,27 +21,54 @@ public class Neo4JDao {
     }
 
 
-//    private static enum RelTypes implements RelationshipType {
-//        KNOWS
+    private static enum RelTypes implements RelationshipType {
+        KNOWS
+    }
+
+    public void createNodes(List<Map<String, Object>> rs, final TableDetail tableDetail) throws SQLException {
+
+
+        try (Transaction tx = graphDb.beginTx()) {
+
+            List<String> fields = tableDetail.getFields();
+
+            for (Map row : rs) {
+
+                Node currentNode = graphDb.createNode();
+                currentNode.addLabel(new Label() {
+                    @Override
+                    public String name() {
+                        return tableDetail.getTableName();
+                    }
+                });
+
+                for (String field : fields) {
+                    Object object = row.get(field);
+
+                    currentNode.setProperty(field, object);
+                }
+
+            }
+            tx.success();
+        }
+    }
+
+//    public void createRelationships(List<Map<String, Object>> rs, TableDetail tableDetail) {
+//
+//
+//        try (Transaction tx = graphDb.beginTx()) {
+//
+//            graphDb.getNodeById()
+//
+//            tx.success();
+//        }
 //    }
 
-    public void createNode(List<Map<String, Object>> rs, TableDetail tableDetail) throws SQLException {
-
-
-
-    }
-
-    public void createAttributes(ResultSet rs, TableDetail tableDetail) {
-
-        List<String> fields = tableDetail.getFields();
-
-
-
-
-    }
-
-    public void createDb() throws IOException {
-
+//    public void createDb() throws IOException {
+//
+//
+//        Node firstNode;
+//        Node secondNode;
 ////         START SNIPPET: transaction
 //        try (Transaction tx = graphDb.beginTx()) {
 //            // Database operations go here
@@ -54,7 +79,7 @@ public class Neo4JDao {
 //            secondNode = graphDb.createNode();
 //            secondNode.setProperty("message", "World!");
 //
-//            relationship = firstNode.createRelationshipTo(secondNode, RelTypes.KNOWS);
+//            Relationship relationship = firstNode.createRelationshipTo(secondNode, RelTypes.KNOWS);
 //            relationship.setProperty("message", "brave Neo4j ");
 //            // END SNIPPET: addData
 //
@@ -64,7 +89,7 @@ public class Neo4JDao {
 //            System.out.print(secondNode.getProperty("message"));
 //            // END SNIPPET: readData
 //
-//            greeting = ((String) firstNode.getProperty("message"))
+//            String greeting = ((String) firstNode.getProperty("message"))
 //                    + ((String) relationship.getProperty("message"))
 //                    + ((String) secondNode.getProperty("message"));
 //
@@ -72,7 +97,7 @@ public class Neo4JDao {
 //            tx.success();
 //        }
 ////         END SNIPPET: transaction
-    }
+//    }
 
 //    void removeData() {
 //        try (Transaction tx = graphDb.beginTx()) {

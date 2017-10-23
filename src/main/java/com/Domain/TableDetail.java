@@ -18,6 +18,7 @@
  */
 package com.Domain;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,10 +26,8 @@ public class TableDetail {
 
     public static final String schemaName = "hibernate";
 
-    private final String table;
-
-    public String getTable() {
-        return table;
+    public String getTableName() {
+        return tableName;
     }
 
     public List<String> getPk() {
@@ -43,39 +42,38 @@ public class TableDetail {
         return fks;
     }
 
-    private final List<String> pk;
-    private final List<String> fields;
-    private final Map<String, String> fks;
-
-    public TableDetail(String table, List< String> pk, List<String> fields, Map<String, String> fks) {
-        this.table = table;
+    public void setPk(List<String> pk) {
         this.pk = pk;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public void setFields(List<String> fields) {
         this.fields = fields;
+    }
+
+    public void setFks(Map<String, String> fks) {
         this.fks = fks;
     }
 
-    public boolean hasPk() {
-        return pk != null && pk.size() > 0;
+    private  List<String> pk;
+    private  String tableName;
+    private  List<String> fields;
+    private  Map<String, String> fks;
+
+
+    public List<String> getForeignKeyColumns() {
+
+        return new ArrayList<>(fks.keySet());
     }
 
-    public int fieldCount() {
-        return fields.size();
-    }
-
-//    public static TableDetail get(String table) {
-//        return TABLES.get(table);
-//    }
-//
-//    public static TableDetail add(String table, List<String> pks, List<String> fields, Map<List<String>, String> fks) {
-//        TableDetail tableInfo = new TableDetail(table, pks, fields, fks);
-//        TABLES.put(table, tableInfo);
-//        return tableInfo;
-//    }
 
     @Override
     public String toString() {
         return "TableInfo{" +
-                ", table='" + table + '\'' +
+                ", tableName='" + tableName + '\'' +
                 ", pk='" + pk + '\'' +
                 ", fields=" + fields +
                 ", fks=" + fks +

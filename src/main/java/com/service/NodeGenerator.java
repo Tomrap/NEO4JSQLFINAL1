@@ -35,7 +35,8 @@ public class NodeGenerator {
         //todo junction table
 
         List<Map<String, Object>> rs = dao.readTableData(tableDetail);
-        neo4JDao.createNode(rs,tableDetail);
+        neo4JDao.createNodes(rs,tableDetail);
+//        neo4JDao.createRelationships(rs,tableDetail);
 
     }
 }
