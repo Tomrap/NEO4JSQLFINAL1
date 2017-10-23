@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by John on 2017-10-23.
@@ -33,7 +34,7 @@ public class NodeGenerator {
 
         //todo junction table
 
-        ResultSet rs = dao.readTableData(tableDetail);
+        List<Map<String, Object>> rs = dao.readTableData(tableDetail);
         neo4JDao.createNode(rs,tableDetail);
 
     }

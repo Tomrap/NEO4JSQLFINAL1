@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by John on 2017-01-08.
@@ -27,8 +29,17 @@ public class Dao {
     private JdbcTemplate jdbcTemplate;
 
 
-    public ResultSet readTableData(TableDetail table) throws SQLException {
-        return jdbcTemplate.getDataSource().getConnection().createStatement().executeQuery("SELECT * from " + TableDetail.schemaName+"."+ table.table);
+    public List<Map<String, Object>> readTableData(TableDetail table) throws SQLException {
+
+        String tableName = TableDetail.schemaName+"."+ table.getTable();
+
+        String query = String.format("SELECT * from " + tableName);
+
+        List<Map<String, Object>> rows = getJdbcTemplate().queryForList(query);
+
+//        return jdbcTemplate.getDataSource().getConnection().createStatement().executeQuery("SELECT * from " + TableDetail.schemaName+"."+ table.getTable());
+
+        return rows;
     }
 
 

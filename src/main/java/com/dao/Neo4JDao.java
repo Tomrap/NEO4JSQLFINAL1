@@ -2,8 +2,7 @@
 package com.dao;
 
 import com.Domain.TableDetail;
-import org.neo4j.graphdb.*;
-import org.neo4j.unsafe.impl.batchimport.input.InputNode;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -11,8 +10,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-
-import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
+import java.util.Map;
 
 @Repository
 public class Neo4JDao {
@@ -29,20 +27,17 @@ public class Neo4JDao {
 //        KNOWS
 //    }
 
-    public void createNode(ResultSet rs, TableDetail tableDetail) throws SQLException {
-
-        if (rs.next()) {
-            graphDb.createNode();
+    public void createNode(List<Map<String, Object>> rs, TableDetail tableDetail) throws SQLException {
 
 
-
-        }
 
     }
 
     public void createAttributes(ResultSet rs, TableDetail tableDetail) {
 
         List<String> fields = tableDetail.getFields();
+
+
 
 
     }
