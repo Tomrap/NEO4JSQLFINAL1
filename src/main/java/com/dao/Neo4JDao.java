@@ -68,12 +68,6 @@ public class Neo4JDao {
         }
     }
 
-//    private boolean filterNodes (Node node, String pk, Object ob) {
-//
-//        node.getProperty(pk);
-//        return true;
-//    }
-
     public void createRelationships(TableDetail tableDetail, List<Map<String, Object>> rs) {
 
 
@@ -92,21 +86,6 @@ public class Neo4JDao {
 
                     Optional<Object> primaryNode  = graphDb.execute(primaryNodeQuery.toString()).columnAs("n").stream().findFirst();
 
-
-//                    ///todo check if it is composite primary key and if it is get composite index
-//                    Node primaryNode;
-//                    Index<Node> primayIndex = graphDb.index().forNodes(tableDetail.getTableName());
-//                    primaryNode = primayIndex.get(tableDetail.getPk().get(0), row.get(tableDetail.getPk().get(0))).getSingle();
-
-
-//                    ResourceIterator<Node> primaryNodes = graphDb.findNodes(Label.label(tableDetail.getTableName()));
-//                    Stream<Node> stream = primaryNodes.stream();
-//
-//                    for (String pk : tableDetail.getPk()) {
-//                        stream.filter(node -> filterNodes(node,pk,row.get(pk)));
-//                    }
-
-
                     for (Map.Entry<List<String>, String> entry : tableDetail.getFks().entrySet()) {
 
                         final String foreignTable = entry.getValue();
@@ -123,14 +102,6 @@ public class Neo4JDao {
                         foreignKeyQuery.append(" RETURN n");
 
                         Optional<Object> foreignNode  = graphDb.execute(foreignKeyQuery.toString()).columnAs("n").stream().findFirst();
-
-//                        Index<Node> foreingIndex = graphDb.index().forNodes(foreignTable);
-//                        TableDetail foreignTableDetail = TableDetail.getTable(foreignTable);
-//
-//
-//                        ///todo check if it is composite primary key and if it is get get composite index
-//                        String foreignKeyColumnNameAsPrimary = foreignTableDetail.getPk().get(0);
-//                        Node foreignNode = foreingIndex.get(foreignKeyColumnNameAsPrimary, row.get(entry.getKey())).getSingle();
 
                         if(primaryNode.isPresent() && foreignNode.isPresent()) {
 

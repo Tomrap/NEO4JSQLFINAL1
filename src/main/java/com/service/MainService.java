@@ -30,7 +30,6 @@ public class MainService {
         List<TableDetail> tables = rdbReader.extractTables();
         List<List<Map<String, Object>>> allData = relationalDao.readAllTables(tables);
         graphGenerator.generate(allData,tables);
-
     }
 
 }

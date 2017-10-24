@@ -95,7 +95,6 @@ public class RDBReader {
                 //if (otherTable.equals(table) && !thisTable.equals(table))  it means that we have primary key not foreign key because referenced table is our table,if you look at MySQL you will see that info about every foreign key is
                 //stored twice, once in actual table that contains column for it and once in a table that has it as primary key, obviously we only want to extract this information once, we do this from the table that actually have it as column
                 //if (otherTable.equals(table) && thisTable.equals(table)) it means we have self referential foreign key
-//                fks.put(reference.getForeignKeyColumn().getName(), otherTableName);
             }
         }
         return fks;
