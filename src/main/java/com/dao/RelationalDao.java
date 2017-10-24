@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,10 +14,10 @@ import java.util.Map;
  * Created by John on 2017-01-08.
  */
 @Repository
-public class Dao {
+public class RelationalDao {
 
     @Autowired
-    public Dao(JdbcTemplate jdbcTemplate) {
+    public RelationalDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -27,6 +28,17 @@ public class Dao {
 
     private JdbcTemplate jdbcTemplate;
 
+
+    public List<List<Map<String, Object>>> readAllTables(List<TableDetail> tableDetailList) throws SQLException {
+
+        List<List<Map<String, Object>>> allData = new ArrayList<>();
+
+        for(TableDetail tableDetail: tableDetailList) {
+            allData.add(readTableData(tableDetail));
+        }
+
+        return allData;
+    }
 
     public List<Map<String, Object>> readTableData(TableDetail table) throws SQLException {
 

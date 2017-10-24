@@ -12,13 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import schemacrawler.Main;
 import schemacrawler.schemacrawler.SchemaCrawlerException;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by John on 2017-01-08.
@@ -27,10 +24,10 @@ import java.util.Map;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={SpringConfig.class, WebConfig.class})
 @WebAppConfiguration
-public class DaoTest {
+public class RelationalDaoTest {
 
     @Autowired
-    private Dao dao;
+    private RelationalDao relationalDao;
 
     @Autowired
     private MainService mainService;

@@ -26,7 +26,7 @@ import java.util.Map;
 public class TableDetail {
 
     private static final Map<String, TableDetail> TABLES = new LinkedHashMap<>();
-    public static final String schemaName = "hibernate";
+    public static final String schemaName = "blabla";
 
     public String getTableName() {
         return tableName;
@@ -40,7 +40,7 @@ public class TableDetail {
         return fields;
     }
 
-    public Map<String, String> getFks() {
+    public Map<List<String>, String> getFks() {
         return fks;
     }
 
@@ -56,14 +56,14 @@ public class TableDetail {
         this.fields = fields;
     }
 
-    public void setFks(Map<String, String> fks) {
+    public void setFks(Map<List<String>, String> fks) {
         this.fks = fks;
     }
 
     private  List<String> pk;
     private  String tableName;
     private  List<String> fields;
-    private  Map<String, String> fks;
+    private   Map<List<String>, String> fks;
 
     public static void addtoTables(TableDetail tableDetail) {
         TABLES.put(tableDetail.getTableName(),tableDetail);
@@ -75,7 +75,12 @@ public class TableDetail {
 
     public List<String> getForeignKeyColumns() {
 
-        return new ArrayList<>(fks.keySet());
+        List<String> list = new ArrayList<>();
+
+        for (Map.Entry<List<String>, String> entry : fks.entrySet()) {
+            list.addAll(entry.getKey());
+        }
+        return list;
     }
 
 
