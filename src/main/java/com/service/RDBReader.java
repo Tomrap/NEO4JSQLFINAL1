@@ -53,6 +53,9 @@ public class RDBReader {
             tableDetail.setFields(getColumns(table,tableDetail));
 
             tableList.add(tableDetail);
+
+            TableDetail.addtoTables(tableDetail);
+
         }
         return tableList;
     }
@@ -70,7 +73,7 @@ public class RDBReader {
             fields.add(columnName);
         }
         //remove primary keys
-        fields.removeAll(tableDetail.getPk());
+//        fields.removeAll(tableDetail.getPk());
         //remove foreign keys
         fields.removeAll(tableDetail.getForeignKeyColumns());
 

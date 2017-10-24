@@ -19,11 +19,13 @@
 package com.Domain;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class TableDetail {
 
+    private static final Map<String, TableDetail> TABLES = new LinkedHashMap<>();
     public static final String schemaName = "hibernate";
 
     public String getTableName() {
@@ -63,6 +65,13 @@ public class TableDetail {
     private  List<String> fields;
     private  Map<String, String> fks;
 
+    public static void addtoTables(TableDetail tableDetail) {
+        TABLES.put(tableDetail.getTableName(),tableDetail);
+    }
+
+    public static TableDetail getTable(String tableName) {
+        return TABLES.get(tableName);
+    }
 
     public List<String> getForeignKeyColumns() {
 
