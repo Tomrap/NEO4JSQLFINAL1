@@ -73,12 +73,11 @@ public class RDBReader {
 
     private Map<List<String>, String> getForeignKeys(Table table) {
         Collection<ForeignKey> foreignKeys = table.getForeignKeys();
-        Map<List<String>, String> fks = fks = new LinkedHashMap<>(10);
+        Map<List<String>, String> fks = new LinkedHashMap<>(10);
 
         if (foreignKeys != null) {
 
             for (ForeignKey foreignKey : foreignKeys) {
-
 
                 List<ForeignKeyColumnReference> columnReferences = foreignKey.getColumnReferences();
                 if (columnReferences.isEmpty()) continue;
@@ -99,8 +98,6 @@ public class RDBReader {
         }
         return fks;
     }
-
-
 
     private List<String> getPrimaryKeys(Table table) {
         List<String> pks = new ArrayList<>();

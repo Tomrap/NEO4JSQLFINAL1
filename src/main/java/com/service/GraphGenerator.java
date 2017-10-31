@@ -16,7 +16,6 @@ import java.util.Map;
 @Service
 public class GraphGenerator {
 
-
     @Autowired
     private Neo4JDao neo4JDao;
 
@@ -24,10 +23,10 @@ public class GraphGenerator {
 
         generateNodesAndIndices(tableDetailList,allData);
         generateRelationships(tableDetailList,allData);
-        neo4JDao.deletePrimaryKeysAndIndexes();
+        neo4JDao.deletePrimaryKeys();
     }
 
-    public void generateNodesAndIndices(List<TableDetail> tableDetailList, List<List<Map<String, Object>>> allData) throws SQLException {
+    private void generateNodesAndIndices(List<TableDetail> tableDetailList, List<List<Map<String, Object>>> allData) throws SQLException {
 
         //todo junction table
 
@@ -39,12 +38,17 @@ public class GraphGenerator {
 
             TableDetail tableDetail = it1.next();
             List<Map<String, Object>> row = it2.next();
+
+            if(tableDetail.hasExactlyTwoForeignKeys()) {
+                continue;
+            }
+
             neo4JDao.createNodes(tableDetail, row);
             neo4JDao.createIndices(tableDetail);
         }
     }
 
-    public void generateRelationships(List<TableDetail> tableDetailList, List<List<Map<String, Object>>> allData) throws SQLException {
+    private void generateRelationships(List<TableDetail> tableDetailList, List<List<Map<String, Object>>> allData) throws SQLException {
 
         Iterator<TableDetail> it1 = tableDetailList.iterator();
         Iterator<List<Map<String, Object>>> it2;

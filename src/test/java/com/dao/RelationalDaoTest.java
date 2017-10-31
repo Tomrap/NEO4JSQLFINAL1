@@ -42,9 +42,6 @@ public class RelationalDaoTest {
     public void daoTest() throws IOException {
 
 //        neo4JDao.createDb();
-
-
-
     }
 
     @Test

@@ -18,10 +18,7 @@
  */
 package com.Domain;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TableDetail {
 
@@ -81,6 +78,22 @@ public class TableDetail {
             list.addAll(entry.getKey());
         }
         return list;
+    }
+
+    public boolean hasExactlyTwoForeignKeys() {
+
+        return fks.size() == 2;
+    }
+
+    public boolean isPartOfPk(String name) {
+
+        boolean result = false;
+        for (String pk : getPk()) {
+            if (pk.equals(name)) {
+                result = true;
+            }
+        }
+        return result;
     }
 
 
