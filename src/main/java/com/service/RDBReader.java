@@ -38,17 +38,21 @@ public class RDBReader {
 
         for (final Table table : database.getTables()) {
 
-            TableDetail tableDetail = new TableDetail();
+            //todo consider non tables (views)
+            if(table.getTableType().equals(TableType.TABLE)) {
+                TableDetail tableDetail = new TableDetail();
 
-            String tableName = table.getName();
-            tableDetail.setTableName(tableName);
-            tableDetail.setPk(getPrimaryKeys(table));
-            tableDetail.setFks(getForeignKeys(table));
-            tableDetail.setFields(getColumns(table,tableDetail));
+                String tableName = table.getName();
+                tableDetail.setTableName(tableName);
+                tableDetail.setPk(getPrimaryKeys(table));
+                tableDetail.setFks(getForeignKeys(table));
+                tableDetail.setFields(getColumns(table,tableDetail));
 
-            tableList.add(tableDetail);
+                tableList.add(tableDetail);
 
-            TableDetail.addtoTables(tableDetail);
+                TableDetail.addtoTables(tableDetail);
+            }
+
 
         }
         return tableList;
@@ -66,7 +70,7 @@ public class RDBReader {
             fields.add(columnName);
         }
         //remove foreign keys
-        fields.removeAll(tableDetail.getForeignKeyColumns());
+//        fields.removeAll(tableDetail.getForeignKeyColumns());
 
         return new ArrayList<>(fields);
     }

@@ -5,6 +5,7 @@ import com.dao.Neo4JDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -19,14 +20,14 @@ public class GraphGenerator {
     @Autowired
     private Neo4JDao neo4JDao;
 
-    public void generate(List<List<Map<String, Object>>> allData, List<TableDetail> tableDetailList) throws SQLException {
+    public void generate(List<List<Map<String, Object>>> allData, List<TableDetail> tableDetailList) throws SQLException, IOException {
 
         generateNodesAndIndices(tableDetailList,allData);
         generateRelationships(tableDetailList,allData);
         neo4JDao.deletePrimaryKeys();
     }
 
-    private void generateNodesAndIndices(List<TableDetail> tableDetailList, List<List<Map<String, Object>>> allData) throws SQLException {
+    private void generateNodesAndIndices(List<TableDetail> tableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException {
 
         //todo junction table
 
@@ -39,16 +40,16 @@ public class GraphGenerator {
             TableDetail tableDetail = it1.next();
             List<Map<String, Object>> row = it2.next();
 
-            if(tableDetail.hasExactlyTwoForeignKeys()) {
-                continue;
-            }
+//            if(tableDetail.hasExactlyTwoForeignKeys()) {
+//                continue;
+//            }
 
             neo4JDao.createNodes(tableDetail, row);
             neo4JDao.createIndices(tableDetail);
         }
     }
 
-    private void generateRelationships(List<TableDetail> tableDetailList, List<List<Map<String, Object>>> allData) throws SQLException {
+    private void generateRelationships(List<TableDetail> tableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException {
 
         Iterator<TableDetail> it1 = tableDetailList.iterator();
         Iterator<List<Map<String, Object>>> it2;

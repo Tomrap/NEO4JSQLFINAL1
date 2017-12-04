@@ -48,7 +48,7 @@ public class SpringConfig {
 
     @Bean
     public GraphDatabaseService graphDatabaseService() throws IOException {
-        File DB_PATH = new File( "C:\\Users\\John\\Documents\\Neo4j\\hibernate.db" );
+        File DB_PATH = new File( "C:\\Users\\John\\Documents\\Neo4j\\sakila.db" );
         FileUtils.deleteRecursively( DB_PATH );
         GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
         registerShutdownHook(graphDb);

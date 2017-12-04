@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import schemacrawler.schemacrawler.SchemaCrawlerException;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class MainService {
     @Autowired
     private RDBReader rdbReader;
 
-    public void main() throws SQLException, SchemaCrawlerException {
+    public void main() throws SQLException, SchemaCrawlerException, IOException {
 
         List<TableDetail> tables = rdbReader.extractTables();
         List<List<Map<String, Object>>> allData = relationalDao.readAllTables(tables);

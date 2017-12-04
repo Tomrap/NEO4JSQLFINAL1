@@ -1,6 +1,7 @@
 package com.dao;
 
 import com.Domain.TableDetail;
+import org.apache.commons.compress.utils.IOUtils;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.schema.IndexCreator;
 import org.neo4j.graphdb.schema.IndexDefinition;
@@ -8,11 +9,12 @@ import org.neo4j.graphdb.schema.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.sql.Blob;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Repository
@@ -25,7 +27,20 @@ public class Neo4JDao {
         this.graphDb = graphDb;
     }
 
-    public void createNodes(final TableDetail tableDetail, List<Map<String, Object>> rs) throws SQLException {
+    public Object convertValue(Object value) throws SQLException, IOException {
+        if (value instanceof Date) {
+            return ((Date) value).getTime();
+        }
+        if (value instanceof BigDecimal) return ((BigDecimal) value).doubleValue();
+        if (value instanceof Blob) {
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            IOUtils.copy(((Blob) value).getBinaryStream(), bo);
+            return bo.toByteArray();
+        }
+        return value;
+    }
+
+    public void createNodes(final TableDetail tableDetail, List<Map<String, Object>> rs) throws SQLException, IOException {
 
         try (Transaction tx = graphDb.beginTx()) {
 
@@ -38,7 +53,9 @@ public class Neo4JDao {
 
                 for (String field : fields) {
                     Object object = row.get(field);
-                    currentNode.setProperty(field, object);
+                    if(object != null) {
+                        currentNode.setProperty(field, convertValue(object));
+                    }
                 }
                 tx.success();
             }
@@ -53,6 +70,9 @@ public class Neo4JDao {
 
             IndexCreator indexCreator = schema.indexFor(Label.label(tableDetail.getTableName()));
 
+            if(tableDetail.getPk().size() == 0) {
+                System.out.println("sgg");
+            }
             for (String pk : tableDetail.getPk()) {
                 indexCreator = indexCreator.on(pk);
             }
@@ -98,21 +118,21 @@ public class Neo4JDao {
         return foreignKeyQuery.toString();
     }
 
-    public void createRelationships(TableDetail tableDetail, List<Map<String, Object>> rs) {
+    public void createRelationships(TableDetail tableDetail, List<Map<String, Object>> rs) throws IOException, SQLException {
 
         try (Transaction tx = graphDb.beginTx()) {
 
             if (tableDetail.getFks().size() > 0) {
 
-                if (tableDetail.hasExactlyTwoForeignKeys()) {
-                    for (Map<String, Object> row : rs) {
-                        handleExactlyTwoForeignKeys(tableDetail, row);
-                    }
-                } else{
+//                if (tableDetail.hasExactlyTwoForeignKeys()) {
+//                    for (Map<String, Object> row : rs) {
+//                        handleExactlyTwoForeignKeys(tableDetail, row);
+//                    }
+//                } else{
                     for (Map<String, Object> row : rs) {
                         handleMoreThanTwoForeignKeys(tableDetail,row);
                     }
-                }
+//                }
                 tx.success();
             }
         }
@@ -136,7 +156,7 @@ public class Neo4JDao {
         }
     }
 
-    private void handleExactlyTwoForeignKeys(TableDetail tableDetail, Map<String, Object> row) {
+    private void handleExactlyTwoForeignKeys(TableDetail tableDetail, Map<String, Object> row) throws IOException, SQLException {
 
         List<String> fields = tableDetail.getFields();
 
@@ -156,11 +176,13 @@ public class Neo4JDao {
             Node actualPrimaryNode = (Node) foreignNode1.get();
             Node actualForeignNode = (Node) foreignNode2.get();
             Relationship relationshipTo = actualPrimaryNode.createRelationshipTo(actualForeignNode, () -> foreignTable2);
-            fields.stream().filter(field -> !tableDetail.isPartOfPk(field)).forEach(field -> {
-                Object object = row.get(field);
-                relationshipTo.setProperty(field, object);
-            });
 
+            for (String field : fields) {
+                if(!tableDetail.isPartOfPk(field)) {
+                    Object object = row.get(field);
+                    relationshipTo.setProperty(field, convertValue(object));
+                }
+            }
         }
     }
 
@@ -171,6 +193,10 @@ public class Neo4JDao {
                 TableDetail tableDetail = TableDetail.getTable(node.getLabels().iterator().next().toString());
 
                 tableDetail.getPk().forEach(node::removeProperty);
+                Iterator<List<String>> iterator = tableDetail.getFks().keySet().iterator();
+                while(iterator.hasNext()) {
+                    iterator.next().forEach(node::removeProperty);
+                }
             }
             tx.success();
         }
