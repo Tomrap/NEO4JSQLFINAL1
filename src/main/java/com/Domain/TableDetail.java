@@ -57,11 +57,11 @@ public class TableDetail {
         this.fks = fks;
     }
 
-    public long getFirstIndex() {
+    public int getFirstIndex() {
         return firstIndex;
     }
 
-    public void setFirstIndex(long firstIndex) {
+    public void setFirstIndex(int firstIndex) {
         this.firstIndex = firstIndex;
     }
     private  List<String> pk;
@@ -70,17 +70,17 @@ public class TableDetail {
 
     private   Map<List<String>, String> fks;
 
-    private long firstIndex;
+    private int firstIndex;
 
-    public HashMap<Integer, Integer> getMapping() {
-        return mapping;
+    public HashMap<Integer, Integer> getMappingMap() {
+        return mappingMap;
     }
 
-    public void setMapping(HashMap<Integer, Integer> mapping) {
-        this.mapping = mapping;
+    public void setMappingMap(HashMap<Integer, Integer> mappingMap) {
+        this.mappingMap = mappingMap;
     }
 
-    private HashMap<Integer,Integer> mapping;
+    private HashMap<Integer,Integer> mappingMap;
 
     public static void addtoTables(TableDetail tableDetail) {
         TABLES.put(tableDetail.getTableName(),tableDetail);
@@ -99,23 +99,6 @@ public class TableDetail {
         }
         return list;
     }
-
-    public boolean hasExactlyTwoForeignKeys() {
-
-        return fks.size() == 2;
-    }
-
-    public boolean isPartOfPk(String name) {
-
-        boolean result = false;
-        for (String pk : getPk()) {
-            if (pk.equals(name)) {
-                result = true;
-            }
-        }
-        return result;
-    }
-
 
     @Override
     public String toString() {

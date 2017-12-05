@@ -52,21 +52,15 @@ public class RDBReader {
 
                 TableDetail.addtoTables(tableDetail);
             }
-
-
         }
         return tableList;
     }
-
-
-
 
     private List<String> getColumns(Table table, TableDetail tableDetail) {
 
         List<Column> columns = table.getColumns();
         Collection<String> fields = new ArrayList<>(columns.size());
 
-        //all
         for (final Column column : columns) {
             String columnName = column.getName();
             fields.add(columnName);

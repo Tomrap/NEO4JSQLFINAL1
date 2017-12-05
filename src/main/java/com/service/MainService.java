@@ -37,8 +37,4 @@ public class MainService {
         graphGenerator.generate(allData,tables);
     }
 
-    public long hash(String code) {
-        return code.hashCode();
-    }
-
 }

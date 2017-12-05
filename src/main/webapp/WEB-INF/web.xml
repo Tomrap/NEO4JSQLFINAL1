@@ -45,8 +45,8 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
             <param-value>com.config</param-value>
         </init-param>
     </servlet>
-    <servlet-mapping>
+    <servlet-mappingMap>
         <servlet-name>appServlet</servlet-name>
         <url-pattern>/</url-pattern>
-    </servlet-mapping>
+    </servlet-mappingMap>
 </web-app>

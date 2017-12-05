@@ -28,22 +28,18 @@ public class GraphGenerator {
 
         logger.info("Start generating graph database");
 
-        generateNodesAndIndices(tableDetailList,allData);
-
+        generateNodes(tableDetailList,allData);
         generateRelationships(tableDetailList,allData);
-//        neo4JDao.deletePrimaryAndForeignKeys();
-        neo4JDao.shutDown();
     }
 
-    private void generateNodesAndIndices(List<TableDetail> tableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException {
+    private void generateNodes(List<TableDetail> tableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException {
 
-        logger.info("Start generating nodes and indices");
+        logger.info("Start generating nodes");
 
-//        tableDetailList.get(0).setFirstIndex(0);
         Iterator<TableDetail> it1 = tableDetailList.iterator();
         Iterator<List<Map<String, Object>>> it2;
         it2 = allData.iterator();
-        long firstIndex = 0;
+        int firstIndex = 0;
 
         while (it1.hasNext() && it2.hasNext()) {
 
@@ -53,15 +49,10 @@ public class GraphGenerator {
             tableDetail.setFirstIndex(firstIndex);
             firstIndex += row.size();
 
-//            if(tableDetail.hasExactlyTwoForeignKeys()) {
-//                continue;
-//            }
-
             neo4JDao.createNodes(tableDetail, row);
-//            neo4JDao.createIndices(tableDetail);
         }
 
-        logger.info("Finished generating nodes and indices");
+        logger.info("Finished generating nodes");
     }
 
     private void generateRelationships(List<TableDetail> tableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException {
@@ -77,7 +68,6 @@ public class GraphGenerator {
             List<Map<String, Object>> row = it2.next();
             neo4JDao.createRelationships(tableDetail, row);
         }
-
         logger.info("Finished generating relationships for database");
     }
 }
