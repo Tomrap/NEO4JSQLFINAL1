@@ -48,6 +48,7 @@ public class RelationalDaoTest {
     public void rdbreaderTest() throws SQLException, SchemaCrawlerException, IOException {
 
         mainService.main();
+
     }
 
 

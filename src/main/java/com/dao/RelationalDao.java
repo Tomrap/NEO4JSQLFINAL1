@@ -1,6 +1,7 @@
 package com.dao;
 
 import com.Domain.TableDetail;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -15,6 +16,8 @@ import java.util.Map;
  */
 @Repository
 public class RelationalDao {
+
+    private static final Logger logger = Logger.getLogger(RelationalDao.class);
 
     @Autowired
     public RelationalDao(JdbcTemplate jdbcTemplate) {
@@ -31,16 +34,23 @@ public class RelationalDao {
 
     public List<List<Map<String, Object>>> readAllTables(List<TableDetail> tableDetailList) throws SQLException {
 
+        logger.info("Started readAllTables for database");
+
         List<List<Map<String, Object>>> allData = new ArrayList<>();
 
         for(TableDetail tableDetail: tableDetailList) {
             allData.add(readTableData(tableDetail));
         }
 
+        logger.info("Finished readAllTables for database");
+
         return allData;
+
     }
 
     public List<Map<String, Object>> readTableData(TableDetail table) throws SQLException {
+
+        logger.info("Started readTableData for " + table.getTableName());
 
         String tableName = TableDetail.schemaName+"."+ table.getTableName();
 
@@ -49,6 +59,8 @@ public class RelationalDao {
         List<Map<String, Object>> rows = getJdbcTemplate().queryForList(query);
 
 //        return jdbcTemplate.getDataSource().getConnection().createStatement().executeQuery("SELECT * from " + TableDetail.schemaName+"."+ table.getTableName());
+
+        logger.info("Finished readTableData for " + table.getTableName());
 
         return rows;
     }

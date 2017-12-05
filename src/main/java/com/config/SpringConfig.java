@@ -3,6 +3,8 @@ package com.config;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.io.fs.FileUtils;
+import org.neo4j.unsafe.batchinsert.BatchInserter;
+import org.neo4j.unsafe.batchinsert.BatchInserters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +16,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
+
 
 /**
  * Created by John on 2017-01-08.
@@ -37,6 +40,11 @@ public class SpringConfig {
 //    }
 
     @Bean
+    public BatchInserter batchInserter() throws IOException {
+        return BatchInserters.inserter(new File( "C:\\Users\\John\\Documents\\Neo4j\\sakila.db" ));
+    }
+
+    @Bean
     public DataSource dataSource() {
         DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName("com.mysql.jdbc.Driver");
@@ -46,29 +54,6 @@ public class SpringConfig {
         return ds;
     }
 
-    @Bean
-    public GraphDatabaseService graphDatabaseService() throws IOException {
-        File DB_PATH = new File( "C:\\Users\\John\\Documents\\Neo4j\\sakila.db" );
-        FileUtils.deleteRecursively( DB_PATH );
-        GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase(DB_PATH);
-        registerShutdownHook(graphDb);
-        return graphDb;
-    }
-
-    private void registerShutdownHook( final GraphDatabaseService graphDb )
-    {
-        // Registers a shutdown hook for the Neo4j instance so that it
-        // shuts down nicely when the VM exits (even if you "Ctrl-C" the
-        // running application).
-        Runtime.getRuntime().addShutdownHook( new Thread()
-        {
-            @Override
-            public void run()
-            {
-                graphDb.shutdown();
-            }
-        } );
-    }
 
     @Bean
     public JdbcTemplate jdbcTemplate(DataSource dataSource) {

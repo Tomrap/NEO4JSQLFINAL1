@@ -59,6 +59,8 @@ public class RDBReader {
     }
 
 
+
+
     private List<String> getColumns(Table table, TableDetail tableDetail) {
 
         List<Column> columns = table.getColumns();
@@ -69,8 +71,9 @@ public class RDBReader {
             String columnName = column.getName();
             fields.add(columnName);
         }
-        //remove foreign keys
-//        fields.removeAll(tableDetail.getForeignKeyColumns());
+
+        fields.removeAll(tableDetail.getForeignKeyColumns());
+        fields.removeAll(tableDetail.getPk());
 
         return new ArrayList<>(fields);
     }

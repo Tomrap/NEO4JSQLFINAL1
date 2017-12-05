@@ -57,10 +57,30 @@ public class TableDetail {
         this.fks = fks;
     }
 
+    public long getFirstIndex() {
+        return firstIndex;
+    }
+
+    public void setFirstIndex(long firstIndex) {
+        this.firstIndex = firstIndex;
+    }
     private  List<String> pk;
     private  String tableName;
     private  List<String> fields;
+
     private   Map<List<String>, String> fks;
+
+    private long firstIndex;
+
+    public HashMap<Integer, Integer> getMapping() {
+        return mapping;
+    }
+
+    public void setMapping(HashMap<Integer, Integer> mapping) {
+        this.mapping = mapping;
+    }
+
+    private HashMap<Integer,Integer> mapping;
 
     public static void addtoTables(TableDetail tableDetail) {
         TABLES.put(tableDetail.getTableName(),tableDetail);

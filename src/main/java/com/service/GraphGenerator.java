@@ -2,6 +2,7 @@ package com.service;
 
 import com.Domain.TableDetail;
 import com.dao.Neo4JDao;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,39 +18,55 @@ import java.util.Map;
 @Service
 public class GraphGenerator {
 
+    private static final Logger logger = Logger.getLogger(GraphGenerator.class);
+
     @Autowired
     private Neo4JDao neo4JDao;
 
     public void generate(List<List<Map<String, Object>>> allData, List<TableDetail> tableDetailList) throws SQLException, IOException {
 
+
+        logger.info("Start generating graph database");
+
         generateNodesAndIndices(tableDetailList,allData);
+
         generateRelationships(tableDetailList,allData);
-        neo4JDao.deletePrimaryKeys();
+//        neo4JDao.deletePrimaryAndForeignKeys();
+        neo4JDao.shutDown();
     }
 
     private void generateNodesAndIndices(List<TableDetail> tableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException {
 
-        //todo junction table
+        logger.info("Start generating nodes and indices");
 
+//        tableDetailList.get(0).setFirstIndex(0);
         Iterator<TableDetail> it1 = tableDetailList.iterator();
         Iterator<List<Map<String, Object>>> it2;
         it2 = allData.iterator();
+        long firstIndex = 0;
 
         while (it1.hasNext() && it2.hasNext()) {
 
             TableDetail tableDetail = it1.next();
             List<Map<String, Object>> row = it2.next();
 
+            tableDetail.setFirstIndex(firstIndex);
+            firstIndex += row.size();
+
 //            if(tableDetail.hasExactlyTwoForeignKeys()) {
 //                continue;
 //            }
 
             neo4JDao.createNodes(tableDetail, row);
-            neo4JDao.createIndices(tableDetail);
+//            neo4JDao.createIndices(tableDetail);
         }
+
+        logger.info("Finished generating nodes and indices");
     }
 
     private void generateRelationships(List<TableDetail> tableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException {
+
+        logger.info("Start generating relationships for database");
 
         Iterator<TableDetail> it1 = tableDetailList.iterator();
         Iterator<List<Map<String, Object>>> it2;
@@ -60,5 +77,7 @@ public class GraphGenerator {
             List<Map<String, Object>> row = it2.next();
             neo4JDao.createRelationships(tableDetail, row);
         }
+
+        logger.info("Finished generating relationships for database");
     }
 }
