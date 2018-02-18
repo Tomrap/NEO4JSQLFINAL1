@@ -1,9 +1,10 @@
 package com.service;
 
 import com.Domain.TableDetail;
-import com.dao.Neo4JDao;
+import com.dao.Neo4JCreationDao;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -20,11 +21,10 @@ public class GraphGenerator {
 
     private static final Logger logger = Logger.getLogger(GraphGenerator.class);
 
-    @Autowired
-    private Neo4JDao neo4JDao;
+    @Autowired @Lazy
+    private Neo4JCreationDao neo4JCreationDao;
 
     public void generate(List<List<Map<String, Object>>> allData, List<TableDetail> tableDetailList) throws SQLException, IOException {
-
 
         logger.info("Start generating graph database");
 
@@ -49,7 +49,7 @@ public class GraphGenerator {
             tableDetail.setFirstIndex(firstIndex);
             firstIndex += row.size();
 
-            neo4JDao.createNodes(tableDetail, row);
+            neo4JCreationDao.createNodes(tableDetail, row);
         }
 
         logger.info("Finished generating nodes");
@@ -66,7 +66,7 @@ public class GraphGenerator {
         while (it1.hasNext() && it2.hasNext()) {
             TableDetail tableDetail = it1.next();
             List<Map<String, Object>> row = it2.next();
-            neo4JDao.createRelationships(tableDetail, row);
+            neo4JCreationDao.createRelationships(tableDetail, row);
         }
         logger.info("Finished generating relationships for database");
     }

@@ -8,6 +8,7 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.apache.log4j.Logger;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
 import java.io.ByteArrayOutputStream;
@@ -20,18 +21,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Lazy
 @Repository
-public class Neo4JDao {
+public class Neo4JCreationDao {
 
     private HashFunction hf = Hashing.murmur3_128();
-    private BatchInserter batchInserter;
-
-    private static final Logger logger = Logger.getLogger(Neo4JDao.class);
 
     @Autowired
-    public Neo4JDao(BatchInserter batchInserter) throws IOException {
-        this.batchInserter = batchInserter;
-    }
+    private BatchInserter batchInserter;
+
+    private static final Logger logger = Logger.getLogger(Neo4JCreationDao.class);
+
 
     public Object convertValue(Object value) throws SQLException, IOException {
         if (value instanceof Date) {

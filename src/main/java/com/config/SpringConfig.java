@@ -1,11 +1,12 @@
 package com.config;
 
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
+import org.neo4j.io.fs.FileUtils;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -36,11 +37,14 @@ public class SpringConfig {
 //        return dataSource;
 //    }
 
+    //SQL to NEO4J - path to NEO4J database
+    @Lazy
     @Bean
     public BatchInserter batchInserter() throws IOException {
         return BatchInserters.inserter(new File( "C:\\Users\\John\\Documents\\Neo4j\\sakila.db" ));
     }
 
+    //SQL to NEO4J - path to SQL database
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource ds = new DriverManagerDataSource();
@@ -49,6 +53,33 @@ public class SpringConfig {
         ds.setUsername("root");
         ds.setPassword("0000");
         return ds;
+    }
+
+    //NEO4J to SQL - path to NEO4J database
+    @Lazy
+    @Bean
+    public GraphDatabaseService graphDatabaseService() throws IOException {
+        File DB_PATH = new File( "C:\\Users\\John\\Documents\\Neo4j\\sakila.db" );
+        GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder( DB_PATH )
+                .setConfig( GraphDatabaseSettings.read_only, "true" )
+                .newGraphDatabase();
+        registerShutdownHook(graphDb);
+        return graphDb;
+    }
+
+    private void registerShutdownHook( final GraphDatabaseService graphDb )
+    {
+        // Registers a shutdown hook for the Neo4j instance so that it
+        // shuts down nicely when the VM exits (even if you "Ctrl-C" the
+        // running application).
+        Runtime.getRuntime().addShutdownHook( new Thread()
+        {
+            @Override
+            public void run()
+            {
+                graphDb.shutdown();
+            }
+        } );
     }
 
 

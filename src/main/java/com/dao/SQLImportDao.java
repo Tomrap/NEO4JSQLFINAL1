@@ -15,12 +15,12 @@ import java.util.Map;
  * Created by John on 2017-01-08.
  */
 @Repository
-public class RelationalDao {
+public class SQLImportDao {
 
-    private static final Logger logger = Logger.getLogger(RelationalDao.class);
+    private static final Logger logger = Logger.getLogger(SQLImportDao.class);
 
     @Autowired
-    public RelationalDao(JdbcTemplate jdbcTemplate) {
+    public SQLImportDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -48,7 +48,7 @@ public class RelationalDao {
 
     }
 
-    public List<Map<String, Object>> readTableData(TableDetail table) throws SQLException {
+    private List<Map<String, Object>> readTableData(TableDetail table) throws SQLException {
 
         logger.info("Started readTableData for " + table.getTableName());
 

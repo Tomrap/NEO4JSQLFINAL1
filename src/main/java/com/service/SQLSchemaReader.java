@@ -1,7 +1,7 @@
 package com.service;
 
 import com.Domain.TableDetail;
-import com.dao.RelationalDao;
+import com.dao.SQLImportDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import schemacrawler.schema.*;
@@ -18,12 +18,12 @@ import java.util.*;
  * Created by John on 2017-10-20.
  */
 @Service
-public class RDBReader {
+public class SQLSchemaReader {
 
     @Autowired
-    private RelationalDao relationalDao;
+    private SQLImportDao SQLImportDao;
 
-    public List<TableDetail> extractTables() throws SQLException, SchemaCrawlerException {
+    public List<TableDetail> extractSchema() throws SQLException, SchemaCrawlerException {
 
         final String schemaName = TableDetail.schemaName;
 
@@ -34,7 +34,7 @@ public class RDBReader {
 
         options.setSchemaInclusionRule((InclusionRule) schemaName::equals);
 
-        final Database database = SchemaCrawlerUtility.getDatabase(relationalDao.getJdbcTemplate().getDataSource().getConnection(), options);
+        final Database database = SchemaCrawlerUtility.getDatabase(SQLImportDao.getJdbcTemplate().getDataSource().getConnection(), options);
 
         for (final Table table : database.getTables()) {
 

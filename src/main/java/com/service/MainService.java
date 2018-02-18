@@ -1,7 +1,6 @@
 package com.service;
 
 import com.Domain.TableDetail;
-import com.dao.RelationalDao;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,17 +23,24 @@ public class MainService {
     private GraphGenerator graphGenerator;
 
     @Autowired
-    private RelationalDao relationalDao;
+    private SQLService sqlService;
 
     @Autowired
-    private RDBReader rdbReader;
+    private GraphReader graphReader;
 
-    public void main() throws SQLException, SchemaCrawlerException, IOException {
+    @Autowired
+    private SQLSchemaReader SQLSchemaReader;
 
+    public void convertSQLtoNEO4J() throws SQLException, SchemaCrawlerException, IOException {
 
-        List<TableDetail> tables = rdbReader.extractTables();
-        List<List<Map<String, Object>>> allData = relationalDao.readAllTables(tables);
+        List<TableDetail> tables = SQLSchemaReader.extractSchema();
+        List<List<Map<String, Object>>> allData = sqlService.readAllTables(tables);
         graphGenerator.generate(allData,tables);
+    }
+
+    public void convertNEO4JtoSQL() {
+
+        graphReader.read();
     }
 
 }
