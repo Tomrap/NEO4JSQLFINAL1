@@ -13,6 +13,18 @@ public class MyRelationship {
         this.values = values;
     }
 
+    public long getFirstNode() {
+        return firstNode;
+    }
+
+    public long getSecondNode() {
+        return secondNode;
+    }
+
+    public Map<String, Object> getValues() {
+        return values;
+    }
+
     private long firstNode;
     private long secondNode;
     private Map<String,Object> values;

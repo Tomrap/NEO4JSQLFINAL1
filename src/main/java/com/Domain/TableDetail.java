@@ -68,6 +68,16 @@ public class TableDetail {
     private  String tableName;
     private  List<String> fields;
 
+    public List<String> getGraphFks() {
+        return graphFks;
+    }
+
+    public void setGraphFks(List<String> graphFks) {
+        this.graphFks = graphFks;
+    }
+
+    private  List<String> graphFks;
+
     private   Map<List<String>, String> fks;
 
     private int firstIndex;
@@ -109,4 +119,5 @@ public class TableDetail {
                 ", fks=" + fks +
                 '}';
     }
+
 }

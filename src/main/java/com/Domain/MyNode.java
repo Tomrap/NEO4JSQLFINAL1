@@ -7,6 +7,14 @@ import java.util.Map;
  */
 public class MyNode {
 
+    public String getPrimaryKeyName() {
+        return primaryKeyName;
+    }
+
+    public Map<String, Object> getValues() {
+        return values;
+    }
+
     private String primaryKeyName;
 
     public MyNode(String primaryKeyName, Map<String, Object> values) {

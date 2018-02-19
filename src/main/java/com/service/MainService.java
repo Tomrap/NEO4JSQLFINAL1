@@ -1,5 +1,6 @@
 package com.service;
 
+import com.Domain.GraphDetail;
 import com.Domain.TableDetail;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class MainService {
     @Autowired
     private SQLSchemaReader SQLSchemaReader;
 
+    @Autowired
+    private SQLSchemaCreator sqlSchemaCreator;
+
     public void convertSQLtoNEO4J() throws SQLException, SchemaCrawlerException, IOException {
 
         List<TableDetail> tables = SQLSchemaReader.extractSchema();
@@ -40,7 +44,9 @@ public class MainService {
 
     public void convertNEO4JtoSQL() {
 
-        graphReader.read();
+        GraphDetail graphDetail = graphReader.read();
+        sqlSchemaCreator.createSchema(graphDetail);
+
     }
 
 }

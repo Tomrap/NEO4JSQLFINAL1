@@ -14,7 +14,26 @@ public class GraphDetail {
         this.allMyRelationships = allMyRelationships;
     }
 
+    public Map<String, List<MyNode>> getAllMyNodes() {
+        return allMyNodes;
+    }
+
+    public Map<MyRelationshipType, List<MyRelationship>> getAllMyRelationships() {
+        return allMyRelationships;
+    }
+
     private Map<String,List<MyNode>> allMyNodes;
-    private Map<MyRelationshipType,List<MyRelationship>> allMyRelationships = new HashMap<>();
+    private Map<MyRelationshipType,List<MyRelationship>> allMyRelationships;
+
+    public Map<MyRelationshipType,List<MyRelationship>> getRelationshipsForGivenLabel(String label) {
+
+        Map<MyRelationshipType,List<MyRelationship>> relationshipsForGivenLabel = new HashMap<>();
+        for(Map.Entry<MyRelationshipType, List<MyRelationship>> element : allMyRelationships.entrySet()) {
+            if(element.getKey().isInARelationshipp(label)) {
+                relationshipsForGivenLabel.put(element.getKey(),element.getValue());
+            }
+        }
+        return relationshipsForGivenLabel;
+    }
 
 }

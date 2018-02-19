@@ -59,7 +59,7 @@ public class SpringConfig {
     @Lazy
     @Bean
     public GraphDatabaseService graphDatabaseService() throws IOException {
-        File DB_PATH = new File( "C:\\Users\\John\\Documents\\Neo4j\\sakila.db" );
+        File DB_PATH = new File( "C:\\Users\\John\\Documents\\Neo4j\\blabla.db" );
         GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder( DB_PATH )
                 .setConfig( GraphDatabaseSettings.read_only, "true" )
                 .newGraphDatabase();
