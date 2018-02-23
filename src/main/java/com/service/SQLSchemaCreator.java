@@ -11,7 +11,7 @@ import java.util.*;
 @Service
 public class SQLSchemaCreator {
 
-    public void createSchema(GraphDetail graphDetail) {
+    public List<TableDetail> createSchema(GraphDetail graphDetail) {
 
         List<TableDetail> tableDetails = new ArrayList<>();
 
@@ -59,19 +59,33 @@ public class SQLSchemaCreator {
             List<String> pks = new ArrayList<>();
             pks.add(exampleNode.getPrimaryKeyName());
             tableDetail.setPk(pks);
-            tableDetail.setFields(new ArrayList<>(exampleNode.getValues().keySet()));
+            tableDetail.setColumnsAndTypes(exampleNode.getValues());
+            //TODO change to optional
+            List<String> remove = foreigKeys.remove(element.getKey());
+            if(remove == null) {
+                tableDetail.setGraphFks(new ArrayList<>());
+            } else {
+                tableDetail.setGraphFks(remove);
+            }
+
             //TODO in case of composite primary key there might be composite foreign key
-            tableDetail.setGraphFks(foreigKeys.remove(element.getKey()));
+
             tableDetails.add(tableDetail);
         }
 
         for (Map.Entry<String, List<String>> element : foreigKeys.entrySet()) {
             TableDetail tableDetail = new TableDetail();
             tableDetail.setTableName(element.getKey());
-            tableDetail.setGraphFks(foreigKeys.remove(element.getKey()));
+            List<String> remove = foreigKeys.remove(element.getKey());
+            //TODO change to optional
+            if(remove == null) {
+                tableDetail.setGraphFks(new ArrayList<>());
+            } else {
+                tableDetail.setGraphFks(remove);
+            }
             tableDetails.add(tableDetail);
         }
-        System.out.println(tableDetails);
+        return tableDetails;
 
 
     }

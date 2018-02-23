@@ -1,12 +1,10 @@
 package com.dao;
 
-import com.Domain.MyRelationship;
 import com.Domain.MyRelationshipType;
 import com.config.SpringConfig;
 import com.config.WebConfig;
 import com.controller.HomeController;
 import com.service.MainService;
-import com.service.SQLSchemaReader;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,7 +50,7 @@ public class SQLImportDaoTest {
     }
 
     @Test
-    public void convertNEO4JtoSQLTest() {
+    public void convertNEO4JtoSQLTest() throws SQLException {
         mainService.convertNEO4JtoSQL();
     }
 

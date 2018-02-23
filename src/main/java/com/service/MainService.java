@@ -35,6 +35,9 @@ public class MainService {
     @Autowired
     private SQLSchemaCreator sqlSchemaCreator;
 
+    @Autowired
+    private SQLSchemaConverter sqlSchemaConverter;
+
     public void convertSQLtoNEO4J() throws SQLException, SchemaCrawlerException, IOException {
 
         List<TableDetail> tables = SQLSchemaReader.extractSchema();
@@ -42,10 +45,13 @@ public class MainService {
         graphGenerator.generate(allData,tables);
     }
 
-    public void convertNEO4JtoSQL() {
+    public void convertNEO4JtoSQL() throws SQLException {
 
         GraphDetail graphDetail = graphReader.read();
-        sqlSchemaCreator.createSchema(graphDetail);
+        List<TableDetail> schema = sqlSchemaCreator.createSchema(graphDetail);
+        sqlSchemaConverter.createSQLSchema(schema);
+
+
 
     }
 

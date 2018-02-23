@@ -23,11 +23,28 @@ import java.util.*;
 public class TableDetail {
 
     private static final Map<String, TableDetail> TABLES = new LinkedHashMap<>();
-    public static final String schemaName = "sakila";
+    public static final String schemaName = "sakila1";
+
+    private  List<String> pk;
+    private  String tableName;
+    private  List<String> fields;
+    private  List<String> graphFks;
+    private   Map<List<String>, String> fks;
+    private int firstIndex;
+    private Map<String, Object> columnsAndTypes;
+
+    public Map<String, Object> getColumnsAndTypes() {
+        return columnsAndTypes;
+    }
+
+    public void setColumnsAndTypes(Map<String, Object> columnsAndTypes) {
+        this.columnsAndTypes = columnsAndTypes;
+    }
 
     public String getTableName() {
         return tableName;
     }
+
 
     public List<String> getPk() {
         return pk;
@@ -64,9 +81,6 @@ public class TableDetail {
     public void setFirstIndex(int firstIndex) {
         this.firstIndex = firstIndex;
     }
-    private  List<String> pk;
-    private  String tableName;
-    private  List<String> fields;
 
     public List<String> getGraphFks() {
         return graphFks;
@@ -75,12 +89,6 @@ public class TableDetail {
     public void setGraphFks(List<String> graphFks) {
         this.graphFks = graphFks;
     }
-
-    private  List<String> graphFks;
-
-    private   Map<List<String>, String> fks;
-
-    private int firstIndex;
 
     public HashMap<Integer, Integer> getMappingMap() {
         return mappingMap;
