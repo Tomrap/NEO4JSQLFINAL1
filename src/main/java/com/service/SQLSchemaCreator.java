@@ -61,6 +61,7 @@ public class SQLSchemaCreator {
             tableDetail.setPk(pks);
             tableDetail.setColumnsAndTypes(exampleNode.getValues());
             //TODO change to optional
+            //TODO in case of composite primary key there might be composite foreign key
             List<String> remove = foreigKeys.remove(element.getKey());
             if(remove == null) {
                 tableDetail.setGraphFks(new ArrayList<>());
@@ -68,7 +69,7 @@ public class SQLSchemaCreator {
                 tableDetail.setGraphFks(remove);
             }
 
-            //TODO in case of composite primary key there might be composite foreign key
+
 
             tableDetails.add(tableDetail);
         }
@@ -76,6 +77,10 @@ public class SQLSchemaCreator {
         for (Map.Entry<String, List<String>> element : foreigKeys.entrySet()) {
             TableDetail tableDetail = new TableDetail();
             tableDetail.setTableName(element.getKey());
+            List<String> pks = new ArrayList<>();
+            pks.add(element.getKey());
+            tableDetail.setPk(pks);
+            tableDetail.setColumnsAndTypes(new HashMap<>());
             List<String> remove = foreigKeys.remove(element.getKey());
             //TODO change to optional
             if(remove == null) {

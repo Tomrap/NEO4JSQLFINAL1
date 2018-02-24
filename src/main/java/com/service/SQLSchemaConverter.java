@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import static org.jooq.impl.DSL.constraint;
 
@@ -41,7 +42,8 @@ public class SQLSchemaConverter {
         if (value instanceof Blob) {
             return SQLDataType.BLOB;
         }
-        return null;
+        //TODO make sure it never returns null
+        return SQLDataType.BLOB;
     }
 
     public void createSQLSchema(List<TableDetail> tableDetails) throws SQLException {
@@ -49,7 +51,9 @@ public class SQLSchemaConverter {
 
         DSLContext create = DSL.using(SQLImportDao.getJdbcTemplate().getDataSource().getConnection(), SQLDialect.MYSQL);
 
-        String sqlSchema = create.createSchema(TableDetail.schemaName).getSQL();
+        StringJoiner stringJoiner = new StringJoiner(System.lineSeparator());
+
+        stringJoiner.add(create.createSchema(TableDetail.schemaName).getSQL());
 
         for(TableDetail tableDetail : tableDetails) {
 
@@ -57,37 +61,32 @@ public class SQLSchemaConverter {
 
             //TODO currently name of the primary key is the same as the name of the table and this is used later!
             //copy pk
-            for(String element:tableDetail.getPk()) {
+            for (String element : tableDetail.getPk()) {
                 table.column(element, SQLDataType.INTEGER);
             }
 
             //copy fields
-            for(Map.Entry<String, Object> element : tableDetail.getColumnsAndTypes().entrySet()) {
-
+            for (Map.Entry<String, Object> element : tableDetail.getColumnsAndTypes().entrySet()) {
                 table.column(element.getKey(), convertValue(element.getValue()));
-
             }
 
-            //copy fks
-            for(String element:tableDetail.getGraphFks()) {
-                table.column(element, SQLDataType.INTEGER);
-            }
-
-            //setUpConstraints
-            for(String element:tableDetail.getPk()) {
+            //set up Pk Constraint
+            for (String element : tableDetail.getPk()) {
                 ((CreateTableColumnStep) table).constraints(constraint(element.toUpperCase()).primaryKey(element));
             }
 
-            for(String element:tableDetail.getGraphFks()) {
-                ((CreateTableColumnStep) table).constraints(constraint(element.toUpperCase()).foreignKey(element).references(element,element));
-            }
-
-            String sql = ((CreateTableColumnStep) table).getSQL();
-            System.out.println(sql);
-
+            stringJoiner.add(((CreateTableColumnStep) table).getSQL());
         }
 
+        for(TableDetail tableDetail : tableDetails) {
+            //copy fks
+            for(String element:tableDetail.getGraphFks()) {
+                stringJoiner.add(create.alterTable(tableDetail.getTableName()).add(element,  SQLDataType.INTEGER).getSQL());
+                stringJoiner.add(create.alterTable(tableDetail.getTableName()).add(constraint(element.toUpperCase()).foreignKey(element).references(element,element)).getSQL());
+            }
+        }
 
+        System.out.println(stringJoiner.toString());
     }
 
 }
