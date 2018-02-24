@@ -52,7 +52,11 @@ public class MainService {
         sqlSchemaConverter.createSQLSchema(schema);
 
 
+    }
 
+    public void schemaCreation() {
+
+        System.out.println("Yes");
     }
 
 }

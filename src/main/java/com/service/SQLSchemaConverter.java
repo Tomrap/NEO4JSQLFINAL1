@@ -53,7 +53,11 @@ public class SQLSchemaConverter {
 
         StringJoiner stringJoiner = new StringJoiner(System.lineSeparator());
 
-        stringJoiner.add(create.createSchema(TableDetail.schemaName).getSQL());
+        String schema = TableDetail.schemaName;
+
+        stringJoiner.add(create.createSchema(schema).getSQL());
+
+        stringJoiner.add("USE `" + schema + "`");
 
         for(TableDetail tableDetail : tableDetails) {
 
@@ -62,7 +66,7 @@ public class SQLSchemaConverter {
             //TODO currently name of the primary key is the same as the name of the table and this is used later!
             //copy pk
             for (String element : tableDetail.getPk()) {
-                table.column(element, SQLDataType.INTEGER);
+                table.column(element+"_ID", SQLDataType.INTEGER.nullable(false));
             }
 
             //copy fields
@@ -72,7 +76,7 @@ public class SQLSchemaConverter {
 
             //set up Pk Constraint
             for (String element : tableDetail.getPk()) {
-                ((CreateTableColumnStep) table).constraints(constraint(element.toUpperCase()).primaryKey(element));
+                ((CreateTableColumnStep) table).constraints(constraint(element+"_ID").primaryKey(element+"_ID"));
             }
 
             stringJoiner.add(((CreateTableColumnStep) table).getSQL());
@@ -81,8 +85,8 @@ public class SQLSchemaConverter {
         for(TableDetail tableDetail : tableDetails) {
             //copy fks
             for(String element:tableDetail.getGraphFks()) {
-                stringJoiner.add(create.alterTable(tableDetail.getTableName()).add(element,  SQLDataType.INTEGER).getSQL());
-                stringJoiner.add(create.alterTable(tableDetail.getTableName()).add(constraint(element.toUpperCase()).foreignKey(element).references(element,element)).getSQL());
+                stringJoiner.add(create.alterTable(tableDetail.getTableName()).add(element+"_ID",  SQLDataType.INTEGER).getSQL());
+                stringJoiner.add(create.alterTable(tableDetail.getTableName()).add(constraint(tableDetail.getTableName()+"_"+element).foreignKey(element+"_ID").references(element,element+"_ID")).getSQL());
             }
         }
 

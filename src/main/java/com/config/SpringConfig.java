@@ -1,14 +1,18 @@
 package com.config;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Resource;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.io.fs.FileUtils;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
 import org.springframework.context.annotation.*;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.init.DataSourceInitializer;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.sql.DataSource;
@@ -44,15 +48,31 @@ public class SpringConfig {
         return BatchInserters.inserter(new File( "C:\\Users\\John\\Documents\\Neo4j\\sakila.db" ));
     }
 
-    //SQL to NEO4J - path to SQL database
+    //path to SQL database
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName("com.mysql.jdbc.Driver");
-        ds.setUrl("jdbc:mysql://localhost:3306/sakila");
+        ds.setUrl("jdbc:mysql://localhost:3306/");
         ds.setUsername("root");
         ds.setPassword("0000");
         return ds;
+    }
+
+    @Bean
+    public ResourceDatabasePopulator resourceDatabasePopulator() {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("schema.sql").getFile());
+        FileSystemResource schemaFile = new FileSystemResource(file);
+        return new ResourceDatabasePopulator(schemaFile);
+    }
+
+    @Bean
+    public DataSourceInitializer dataSourceInitializer(DataSource dataSource, ResourceDatabasePopulator resourceDatabasePopulator) {
+        DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
+        dataSourceInitializer.setDataSource(dataSource);
+        dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
+        return dataSourceInitializer;
     }
 
     //NEO4J to SQL - path to NEO4J database

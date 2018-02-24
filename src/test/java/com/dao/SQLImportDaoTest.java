@@ -43,6 +43,11 @@ public class SQLImportDaoTest {
     }
 
     @Test
+    public void schemaCreation() {
+        mainService.schemaCreation();
+    }
+
+    @Test
     public void convertSQLtoNEO4JTest() throws SQLException, SchemaCrawlerException, IOException {
 
         mainService.convertSQLtoNEO4J();
