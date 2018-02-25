@@ -45,7 +45,6 @@ public class TableDetail {
         return tableName;
     }
 
-
     public List<String> getPk() {
         return pk;
     }

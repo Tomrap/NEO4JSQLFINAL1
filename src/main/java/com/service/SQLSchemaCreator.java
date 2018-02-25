@@ -50,15 +50,16 @@ public class SQLSchemaCreator {
 
         }
 
-        Map<String, List<MyNode>> allMyNodes = graphDetail.getAllMyNodes();
-        for(Map.Entry<String, List<MyNode>> element: allMyNodes.entrySet()) {
-            MyNode exampleNode = element.getValue().get(0);
+        Map<String, Set<MyNode>> allMyNodes = graphDetail.getAllMyNodes();
+        for(Map.Entry<String, Set<MyNode>> element: allMyNodes.entrySet()) {
+            MyNode exampleNode = element.getValue().iterator().next();
             TableDetail tableDetail = new TableDetail();
             tableDetail.setTableName(element.getKey());
             //TODO in case of junction table there might be composite primary key
             List<String> pks = new ArrayList<>();
             pks.add(exampleNode.getPrimaryKeyName());
             tableDetail.setPk(pks);
+            //TODO what if there is NULL in nay column - cannot extract type
             tableDetail.setColumnsAndTypes(exampleNode.getValues());
             //TODO change to optional
             //TODO in case of composite primary key there might be composite foreign key

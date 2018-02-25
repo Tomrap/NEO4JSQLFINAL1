@@ -25,7 +25,7 @@ public class NEO4JReaderDao {
     public GraphDetail read() {
 
 
-        Map<String,List<MyNode>> allMyNodes = new HashMap<>();
+        Map<String, Set<MyNode>> allMyNodes = new HashMap<>();
         Map<MyRelationshipType,List<MyRelationship>> allMyRelationships = new HashMap<>();
         GraphDetail graphDetail = new GraphDetail(allMyNodes,allMyRelationships);
         try ( Transaction tx = graphDatabaseService.beginTx() )
@@ -35,14 +35,14 @@ public class NEO4JReaderDao {
 
             for(Node node : allNodes) {
 
-                //TODO make sure that labels are always in the same order
+                //TODO make sure that labels are always in the same order - yes do this
                 Iterable<Label> labels = node.getLabels();
 
                 String oneLabel = StreamSupport.stream(labels.spliterator(), false).map(Object::toString).collect(Collectors.joining(""));
 
-                MyNode myNode = new MyNode(oneLabel,node.getAllProperties());
+                MyNode myNode = new MyNode(oneLabel,node.getAllProperties(),node.getId());
 
-                allMyNodes.computeIfAbsent(oneLabel, k -> new ArrayList<>()).add(myNode);
+                allMyNodes.computeIfAbsent(oneLabel, k -> new HashSet<>()).add(myNode);
 
             }
 
