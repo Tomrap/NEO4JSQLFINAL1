@@ -5,9 +5,19 @@ import com.dao.SQLImportDao;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
+import org.jooq.tools.StringUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -22,7 +32,14 @@ import static org.jooq.impl.DSL.constraint;
  * Created by John on 2018-02-23.
  */
 @Service
-public class SQLSchemaConverter {
+public class SQLSchemaConverter implements ApplicationContextAware {
+
+    private ApplicationContext applicationContext;
+
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
 
     @Autowired
     private SQLImportDao SQLImportDao;
@@ -46,7 +63,7 @@ public class SQLSchemaConverter {
         return SQLDataType.BLOB;
     }
 
-    public void createSQLSchema(List<TableDetail> tableDetails) throws SQLException {
+    public void createSQLSchema(List<TableDetail> tableDetails) throws SQLException, IOException {
 
 
         DSLContext create = DSL.using(SQLImportDao.getJdbcTemplate().getDataSource().getConnection(), SQLDialect.MYSQL);
@@ -90,7 +107,16 @@ public class SQLSchemaConverter {
             }
         }
 
-        System.out.println(stringJoiner.toString());
+        String rootPath = System.getProperty("user.dir");
+        File schemaSQL = new File(StringUtils.join(rootPath, "/src/" , "schema.sql"));
+        schemaSQL.createNewFile();
+        BufferedWriter writer = new BufferedWriter(new FileWriter(schemaSQL));
+        writer.write(stringJoiner.toString());
+        writer.close();
+
+        applicationContext.getBean("dataSourceInitializer");
+
+        schemaSQL.delete();
     }
 
 }

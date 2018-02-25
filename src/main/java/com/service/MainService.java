@@ -45,7 +45,7 @@ public class MainService {
         graphGenerator.generate(allData,tables);
     }
 
-    public void convertNEO4JtoSQL() throws SQLException {
+    public void convertNEO4JtoSQL() throws SQLException, IOException {
 
         GraphDetail graphDetail = graphReader.read();
         List<TableDetail> schema = sqlSchemaCreator.createSchema(graphDetail);

@@ -1,5 +1,6 @@
 package com.config;
 
+import org.jooq.tools.StringUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Resource;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
@@ -59,14 +60,16 @@ public class SpringConfig {
         return ds;
     }
 
+    @Lazy
     @Bean
     public ResourceDatabasePopulator resourceDatabasePopulator() {
-        ClassLoader classLoader = getClass().getClassLoader();
-        File file = new File(classLoader.getResource("schema.sql").getFile());
-        FileSystemResource schemaFile = new FileSystemResource(file);
+        String rootPath = System.getProperty("user.dir");
+        File schemaSQL = new File(StringUtils.join(rootPath, "/src/" , "schema.sql"));
+        FileSystemResource schemaFile = new FileSystemResource(schemaSQL);
         return new ResourceDatabasePopulator(schemaFile);
     }
 
+    @Lazy
     @Bean
     public DataSourceInitializer dataSourceInitializer(DataSource dataSource, ResourceDatabasePopulator resourceDatabasePopulator) {
         DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();

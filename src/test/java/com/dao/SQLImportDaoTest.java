@@ -55,7 +55,7 @@ public class SQLImportDaoTest {
     }
 
     @Test
-    public void convertNEO4JtoSQLTest() throws SQLException {
+    public void convertNEO4JtoSQLTest() throws SQLException, IOException {
         mainService.convertNEO4JtoSQL();
     }
 
