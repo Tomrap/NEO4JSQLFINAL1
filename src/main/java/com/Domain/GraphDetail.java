@@ -7,15 +7,15 @@ import java.util.*;
  */
 public class GraphDetail {
 
-    private Map<String, Set<MyNode>> allMyNodes;
+    private Map<String, Map<Long, MyNode>> allMyNodes;
     private Map<MyRelationshipType,List<MyRelationship>> allMyRelationships;
 
-    public GraphDetail(Map<String, Set<MyNode>> allMyNodes, Map<MyRelationshipType, List<MyRelationship>> allMyRelationships) {
+    public GraphDetail(Map<String, Map<Long, MyNode>> allMyNodes, Map<MyRelationshipType, List<MyRelationship>> allMyRelationships) {
         this.allMyNodes = allMyNodes;
         this.allMyRelationships = allMyRelationships;
     }
 
-    public Map<String, Set<MyNode>> getAllMyNodes() {
+    public Map<String, Map<Long, MyNode>> getAllMyNodes() {
         return allMyNodes;
     }
 
@@ -34,10 +34,10 @@ public class GraphDetail {
         return relationshipsForGivenLabel;
     }
 
-    public Map<String, Set<MyNode>> nodesWithoutAnyForeignKeys(List<TableDetail> list) {
+    public Map<String, Map<Long, MyNode>> nodesWithoutAnyForeignKeys(List<TableDetail> list) {
 
-        Map<String, Set<MyNode>> nodes = new HashMap<>();
-        for(Map.Entry<String, Set<MyNode>> element: allMyNodes.entrySet()) {
+        Map<String, Map<Long, MyNode>> nodes = new HashMap<>();
+        for(Map.Entry<String, Map<Long, MyNode>> element: allMyNodes.entrySet()) {
             Optional<TableDetail> first = list.stream().filter(o -> o.getTableName().equals(element.getKey())).findFirst();
             TableDetail tableDetail = first.get();
             if(tableDetail.getGraphFks().size() == 0) {
@@ -49,15 +49,13 @@ public class GraphDetail {
 
     public void assignPrimaryKeysToNodes() {
         int count;
-        for (Map.Entry<String, Set<MyNode>> element : allMyNodes.entrySet()) {
+        for (Map.Entry<String, Map<Long, MyNode>> element : allMyNodes.entrySet()) {
             count = 1;
-            for (MyNode node : element.getValue()) {
+            for (MyNode node : element.getValue().values()) {
                 node.setSqlID(count);
                 count++;
             }
         }
     }
-
-
 
 }

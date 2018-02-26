@@ -24,6 +24,7 @@ public class SQLSchemaCreator {
             //for given entry decide where the foreignkey goes (1,2 or new table)
 
 
+            MyRelationshipType key = element.getKey();
             Set<Long> firstNodesIds = new HashSet<>();
             Set<Long> secondNodesIds = new HashSet<>();
             List<MyRelationship> value = element.getValue();
@@ -36,23 +37,28 @@ public class SQLSchemaCreator {
 
             if(firstNodesIds.size()<value.size() && secondNodesIds.size()<value.size()) {
                 List<String> bothForeignKeys = new ArrayList<>();
-                bothForeignKeys.add(element.getKey().getFirstNode());
-                bothForeignKeys.add(element.getKey().getSecondNode());
-                foreigKeys.computeIfAbsent(element.getKey().getFirstNode() +"_"+ element.getKey().getSecondNode(),
+                bothForeignKeys.add(key.getFirstNodeLabel());
+                bothForeignKeys.add(key.getSecondNodeLabel());
+                foreigKeys.computeIfAbsent(key.getFirstNodeLabel() +"_"+ key.getSecondNodeLabel(),
                         k -> new ArrayList<>()).addAll(bothForeignKeys);
+                key.setFirstNodeForeignKey(true);
+                key.setSecondNodeForeignKey(true);
             }
             else if(firstNodesIds.size()<value.size()) {
-                foreigKeys.computeIfAbsent(element.getKey().getSecondNode(),k -> new ArrayList<>()).add(element.getKey().getFirstNode());
+                foreigKeys.computeIfAbsent(key.getSecondNodeLabel(), k -> new ArrayList<>()).add(key.getFirstNodeLabel());
+                key.setFirstNodeForeignKey(true);
             }
             else {
-                foreigKeys.computeIfAbsent(element.getKey().getFirstNode(),k -> new ArrayList<>()).add(element.getKey().getSecondNode());
+                foreigKeys.computeIfAbsent(key.getFirstNodeLabel(), k -> new ArrayList<>()).add(key.getSecondNodeLabel());
+                key.setSecondNodeForeignKey(true);
             }
 
+            System.out.println("df");
         }
 
-        Map<String, Set<MyNode>> allMyNodes = graphDetail.getAllMyNodes();
-        for(Map.Entry<String, Set<MyNode>> element: allMyNodes.entrySet()) {
-            MyNode exampleNode = element.getValue().iterator().next();
+        Map<String, Map<Long, MyNode>> allMyNodes = graphDetail.getAllMyNodes();
+        for(Map.Entry<String, Map<Long, MyNode>> element: allMyNodes.entrySet()) {
+            MyNode exampleNode = element.getValue().values().iterator().next();
             TableDetail tableDetail = new TableDetail();
             tableDetail.setTableName(element.getKey());
             //TODO in case of junction table there might be composite primary key

@@ -2,6 +2,7 @@ package com.service;
 
 import com.Domain.GraphDetail;
 import com.Domain.TableDetail;
+import com.Domain.TableRow;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,8 @@ public class MainService {
 
         GraphDetail graphDetail = graphReader.read();
         List<TableDetail> schema = sqlSchemaCreator.createSchema(graphDetail);
+        Map<String, Map<Integer, TableRow>> stringMapMap = graphReader.convertGraphDetailsToTableRows(graphDetail, schema);
+        System.out.println(stringMapMap);
         sqlSchemaConverter.createSQLSchema(schema);
 
 

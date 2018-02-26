@@ -9,8 +9,11 @@ public class MyNode {
 
     private String primaryKeyName;
     private Map<String,Object> values;
-    private long neo4ID;
     private int sqlID;
+
+    public int getSqlID() {
+        return sqlID;
+    }
 
     public void setSqlID(int sqlID) {
         this.sqlID = sqlID;
@@ -24,10 +27,9 @@ public class MyNode {
         return values;
     }
 
-    public MyNode(String primaryKeyName, Map<String, Object> values, long neo4ID) {
+    public MyNode(String primaryKeyName, Map<String, Object> values) {
         this.primaryKeyName = primaryKeyName;
         this.values = values;
-        this.neo4ID = neo4ID;
     }
 
 }

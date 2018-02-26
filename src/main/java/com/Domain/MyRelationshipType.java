@@ -5,6 +5,34 @@ package com.Domain;
  */
 public class MyRelationshipType {
 
+    private String firstNodeLabel;
+    private String secondNodeLabel;
+    private boolean isFirstNodeForeignKey = false;
+    private boolean isSecondNodeForeignKey = false;
+
+    public boolean isSecondNodeForeignKey() {
+        return isSecondNodeForeignKey;
+    }
+
+    public void setSecondNodeForeignKey(boolean secondNodeForeignKey) {
+        isSecondNodeForeignKey = secondNodeForeignKey;
+    }
+
+    public boolean isFirstNodeForeignKey() {
+        return isFirstNodeForeignKey;
+    }
+
+    public void setFirstNodeForeignKey(boolean firstNodeForeignKey) {
+        isFirstNodeForeignKey = firstNodeForeignKey;
+    }
+    public String getFirstNodeLabel() {
+        return firstNodeLabel;
+    }
+
+    public String getSecondNodeLabel() {
+        return secondNodeLabel;
+    }
+
 
     //code for cyclic graphs
 //    @Override
@@ -14,21 +42,21 @@ public class MyRelationshipType {
 //
 //        MyRelationshipType that = (MyRelationshipType) o;
 //
-//        return firstNode.equals(that.firstNode) && secondNode.equals(that.secondNode)
-//                || firstNode.equals(that.secondNode) && secondNode.equals(that.firstNode);
+//        return firstNodeLabel.equals(that.firstNodeLabel) && secondNodeLabel.equals(that.secondNodeLabel)
+//                || firstNodeLabel.equals(that.secondNodeLabel) && secondNodeLabel.equals(that.firstNodeLabel);
 //
 //    }
 //
 //    @Override
 //    public int hashCode() {
-//        int result = firstNode.hashCode();
-//        result = 31 * (result + secondNode.hashCode());
+//        int result = firstNodeLabel.hashCode();
+//        result = 31 * (result + secondNodeLabel.hashCode());
 //        return result;
 //    }
 
-    public MyRelationshipType(String firstNode, String secondNode) {
-        this.firstNode = firstNode;
-        this.secondNode = secondNode;
+    public MyRelationshipType(String firstNodeLabel, String secondNodeLabel) {
+        this.firstNodeLabel = firstNodeLabel;
+        this.secondNodeLabel = secondNodeLabel;
     }
 
     @Override
@@ -38,30 +66,19 @@ public class MyRelationshipType {
 
         MyRelationshipType that = (MyRelationshipType) o;
 
-        if (!firstNode.equals(that.firstNode)) return false;
-        return secondNode.equals(that.secondNode);
+        if (!firstNodeLabel.equals(that.firstNodeLabel)) return false;
+        return secondNodeLabel.equals(that.secondNodeLabel);
 
     }
 
     @Override
     public int hashCode() {
-        int result = firstNode.hashCode();
-        result = 31 * result + secondNode.hashCode();
+        int result = firstNodeLabel.hashCode();
+        result = 31 * result + secondNodeLabel.hashCode();
         return result;
     }
 
-    public String getFirstNode() {
-        return firstNode;
-    }
-
-    public String getSecondNode() {
-        return secondNode;
-    }
-
-    private String firstNode;
-    private String secondNode;
-
     public boolean isInARelationshipp(String label) {
-        return firstNode.equals(label) || secondNode.equals(label);
+        return firstNodeLabel.equals(label) || secondNodeLabel.equals(label);
     }
 }

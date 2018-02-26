@@ -25,7 +25,7 @@ public class NEO4JReaderDao {
     public GraphDetail read() {
 
 
-        Map<String, Set<MyNode>> allMyNodes = new HashMap<>();
+        Map<String, Map<Long, MyNode>> allMyNodes = new HashMap<>();
         Map<MyRelationshipType,List<MyRelationship>> allMyRelationships = new HashMap<>();
         GraphDetail graphDetail = new GraphDetail(allMyNodes,allMyRelationships);
         try ( Transaction tx = graphDatabaseService.beginTx() )
@@ -40,9 +40,9 @@ public class NEO4JReaderDao {
 
                 String oneLabel = StreamSupport.stream(labels.spliterator(), false).map(Object::toString).collect(Collectors.joining(""));
 
-                MyNode myNode = new MyNode(oneLabel,node.getAllProperties(),node.getId());
+                MyNode myNode = new MyNode(oneLabel,node.getAllProperties());
 
-                allMyNodes.computeIfAbsent(oneLabel, k -> new HashSet<>()).add(myNode);
+                allMyNodes.computeIfAbsent(oneLabel, k -> new HashMap<>()).put(node.getId(),myNode);
 
             }
 

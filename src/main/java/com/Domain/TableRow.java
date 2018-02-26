@@ -1,5 +1,6 @@
 package com.Domain;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -8,5 +9,21 @@ import java.util.Map;
 public class TableRow {
 
     private MyNode myNode;
-    private Map<String, Integer> foreignKeys;
+    private Map<String, Integer> foreignKeys = new HashMap<>();
+
+    public MyNode getMyNode() {
+        return myNode;
+    }
+
+    public void setMyNode(MyNode myNode) {
+        this.myNode = myNode;
+    }
+
+    public Map<String, Integer> getForeignKeys() {
+        return foreignKeys;
+    }
+
+    public void setForeignKeys(Map<String, Integer> foreignKeys) {
+        this.foreignKeys = foreignKeys;
+    }
 }
