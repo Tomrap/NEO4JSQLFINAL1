@@ -63,8 +63,12 @@ public class SpringConfig {
     public ResourceDatabasePopulator resourceDatabasePopulator() {
         String rootPath = System.getProperty("user.dir");
         File schemaSQL = new File(StringUtils.join(rootPath, "/src/" , "schema.sql"));
-        FileSystemResource schemaFile = new FileSystemResource(schemaSQL);
-        return new ResourceDatabasePopulator(schemaFile);
+        File dataSQL = new File(StringUtils.join(rootPath, "/src/" , "data.sql"));
+        File alterSchemaSQL = new File(StringUtils.join(rootPath, "/src/" , "alterSchema.sql"));
+        FileSystemResource schemaSQLFile = new FileSystemResource(schemaSQL);
+        FileSystemResource dataSQLFile = new FileSystemResource(dataSQL);
+        FileSystemResource alterSchemaSQLFile = new FileSystemResource(alterSchemaSQL);
+        return new ResourceDatabasePopulator(schemaSQLFile,dataSQLFile,alterSchemaSQLFile);
     }
 
     @Lazy

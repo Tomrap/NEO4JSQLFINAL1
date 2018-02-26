@@ -52,8 +52,6 @@ public class SQLSchemaCreator {
                 foreigKeys.computeIfAbsent(key.getFirstNodeLabel(), k -> new ArrayList<>()).add(key.getSecondNodeLabel());
                 key.setSecondNodeForeignKey(true);
             }
-
-            System.out.println("df");
         }
 
         Map<String, Map<Long, MyNode>> allMyNodes = graphDetail.getAllMyNodes();

@@ -37,7 +37,7 @@ public class MainService {
     private SQLSchemaCreator sqlSchemaCreator;
 
     @Autowired
-    private SQLSchemaConverter sqlSchemaConverter;
+    private SQLConverter sqlConverter;
 
     public void convertSQLtoNEO4J() throws SQLException, SchemaCrawlerException, IOException {
 
@@ -50,9 +50,13 @@ public class MainService {
 
         GraphDetail graphDetail = graphReader.read();
         List<TableDetail> schema = sqlSchemaCreator.createSchema(graphDetail);
-        Map<String, Map<Integer, TableRow>> stringMapMap = graphReader.convertGraphDetailsToTableRows(graphDetail, schema);
-        System.out.println(stringMapMap);
-        sqlSchemaConverter.createSQLSchema(schema);
+        sqlConverter.createSQLSchema(schema);
+        Map<String, Map<Integer, TableRow>> allRows = graphReader.convertGraphDetailsToTableRows(graphDetail, schema);
+        sqlConverter.createSQLRows(allRows);
+        sqlConverter.executeAnddestroyScripts();
+
+
+
 
 
     }
