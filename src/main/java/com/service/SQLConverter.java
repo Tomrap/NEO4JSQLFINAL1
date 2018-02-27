@@ -46,7 +46,7 @@ public class SQLConverter implements ApplicationContextAware {
             return SQLDataType.INTEGER;
         }
         if(value instanceof String) {
-            return SQLDataType.VARCHAR.length(40);
+            return SQLDataType.VARCHAR.length(130);
         }
         if (value instanceof Date) {
             return SQLDataType.DATE;

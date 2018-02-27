@@ -6,6 +6,7 @@ import com.Domain.MyRelationship;
 import com.Domain.MyRelationshipType;
 import org.neo4j.graphdb.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -16,6 +17,7 @@ import java.util.stream.StreamSupport;
  * Created by John on 2018-02-18.
  */
 
+@Lazy
 @Repository
 public class NEO4JReaderDao {
 

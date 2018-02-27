@@ -23,7 +23,7 @@ import java.util.*;
 public class TableDetail {
 
     private static final Map<String, TableDetail> TABLES = new LinkedHashMap<>();
-    public static final String schemaName = "sakila";
+    public static final String schemaName = "sakila1";
 
     private  List<String> pk;
     private  String tableName;
