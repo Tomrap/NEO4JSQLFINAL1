@@ -1,5 +1,8 @@
 package com.config;
 
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.jooq.tools.StringUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
@@ -17,6 +20,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 
 
 /**
@@ -57,6 +61,7 @@ public class SpringConfig {
         ds.setPassword("0000");
         return ds;
     }
+
 
     @Lazy
     @Bean

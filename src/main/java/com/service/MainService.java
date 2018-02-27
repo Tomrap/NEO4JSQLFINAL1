@@ -53,11 +53,8 @@ public class MainService {
         sqlConverter.createSQLSchema(schema);
         Map<String, Map<Integer, TableRow>> allRows = graphReader.convertGraphDetailsToTableRows(graphDetail, schema);
         sqlConverter.createSQLRows(allRows);
-        sqlConverter.executeAnddestroyScripts();
-
-
-
-
+        sqlConverter.createFOreignKeysConstraints(schema);
+//        sqlConverter.executeAnddestroyScripts();
 
     }
 

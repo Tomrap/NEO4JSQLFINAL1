@@ -19,6 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Blob;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -35,7 +36,6 @@ public class SQLConverter implements ApplicationContextAware {
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
-
 
     @Autowired
     private SQLImportDao SQLImportDao;
@@ -60,14 +60,15 @@ public class SQLConverter implements ApplicationContextAware {
     }
 
     public void createSQLRows(Map<String, Map<Integer, TableRow>> allRows) throws SQLException, IOException {
-        DSLContext create = DSL.using(SQLImportDao.getJdbcTemplate().getDataSource().getConnection(), SQLDialect.MYSQL);
-        StringJoiner stringJoiner = new StringJoiner(System.lineSeparator());
-        String schema = TableDetail.schemaName;
+
+        Connection connection = SQLImportDao.getJdbcTemplate().getDataSource().getConnection();
+        connection.setCatalog(TableDetail.schemaName);
+        DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+
 
         List<Object> rowValues = new ArrayList<>();
         Collection<Field<Object>> columnNames = new ArrayList<>();
-        //TODO
-        stringJoiner.add("USE `" + schema + "`");
+        List<InsertValuesStepN<Record>> inserts = new ArrayList<>();
 
         for(Map.Entry<String, Map<Integer, TableRow>> element: allRows.entrySet()) {
 
@@ -92,36 +93,30 @@ public class SQLConverter implements ApplicationContextAware {
                     rowValues.add(foreignKey.getValue());
                 }
 
-
-                stringJoiner.add(create.insertInto(table(element.getKey()), columnNames).values(rowValues).getSQL(true));
+                inserts.add(create.insertInto(table(element.getKey()), columnNames).values(rowValues));
             }
 
         }
+        create.batch(inserts).execute();
 
 //        System.out.println(stringJoiner.toString());
-
-        String rootPath = System.getProperty("user.dir");
-        File dataSQL = new File(StringUtils.join(rootPath, "/src/" , "data.sql"));
-        dataSQL.createNewFile();
-        BufferedWriter writer = new BufferedWriter(new FileWriter(dataSQL));
-        writer.write(stringJoiner.toString());
-        writer.close();
+//
+//        String rootPath = System.getProperty("user.dir");
+//        File dataSQL = new File(StringUtils.join(rootPath, "/src/" , "data.sql"));
+//        dataSQL.createNewFile();
+//        BufferedWriter writer = new BufferedWriter(new FileWriter(dataSQL));
+//        writer.write(stringJoiner.toString());
+//        writer.close();
 
     }
 
     public void createSQLSchema(List<TableDetail> tableDetails) throws SQLException, IOException {
 
-
-        DSLContext create = DSL.using(SQLImportDao.getJdbcTemplate().getDataSource().getConnection(), SQLDialect.MYSQL);
-
-        StringJoiner stringJoiner = new StringJoiner(System.lineSeparator());
-
+        Connection connection = SQLImportDao.getJdbcTemplate().getDataSource().getConnection();
         String schema = TableDetail.schemaName;
-
-        stringJoiner.add(create.createSchema(schema).getSQL());
-
-        //TODO
-        stringJoiner.add("USE `" + schema + "`");
+        DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+        create.createSchema(schema).execute();
+        connection.setCatalog(TableDetail.schemaName);
 
         for(TableDetail tableDetail : tableDetails) {
 
@@ -148,53 +143,57 @@ public class SQLConverter implements ApplicationContextAware {
                 ((CreateTableColumnStep) table).constraints(constraint(element+"_ID").primaryKey(element+"_ID"));
             }
 
-            stringJoiner.add(((CreateTableColumnStep) table).getSQL());
+            ((CreateTableColumnStep) table).execute();
         }
 
-        String rootPath = System.getProperty("user.dir");
-        File schemaSQL = new File(StringUtils.join(rootPath, "/src/" , "schema.sql"));
-        schemaSQL.createNewFile();
-        BufferedWriter writer = new BufferedWriter(new FileWriter(schemaSQL));
-        writer.write(stringJoiner.toString());
-        writer.close();
+//        String rootPath = System.getProperty("user.dir");
+//        File schemaSQL = new File(StringUtils.join(rootPath, "/src/" , "schema.sql"));
+//        schemaSQL.createNewFile();
+//        BufferedWriter writer = new BufferedWriter(new FileWriter(schemaSQL));
+//        writer.write(stringJoiner.toString());
+//        writer.close();
 
 
+//        createFOreignKeysConstraints(tableDetails, create, schema);
 
+//        rootPath = System.getProperty("user.dir");
+//        File alterSchema = new File(StringUtils.join(rootPath, "/src/" , "alterSchema.sql"));
+//        alterSchema.createNewFile();
+//        writer = new BufferedWriter(new FileWriter(alterSchema));
+//        writer.write(stringJoiner.toString());
+//        writer.close();
 
-        stringJoiner = new StringJoiner(System.lineSeparator());
-        stringJoiner.add("USE `" + schema + "`");
+    }
+
+    public void createFOreignKeysConstraints(List<TableDetail> tableDetails) throws SQLException {
+
+        Connection connection = SQLImportDao.getJdbcTemplate().getDataSource().getConnection();
+        connection.setCatalog(TableDetail.schemaName);
+        DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
 
         for(TableDetail tableDetail : tableDetails) {
             //copy fks
             for(String element:tableDetail.getGraphFks()) {
-                stringJoiner.add(create.alterTable(tableDetail.getTableName()).add(constraint(tableDetail.getTableName()+"_"+element).foreignKey(element+"_ID").references(element,element+"_ID")).getSQL());
+                create.alterTable(tableDetail.getTableName()).add(constraint(tableDetail.getTableName()+"_"+element).foreignKey(element+"_ID").references(element,element+"_ID")).execute();
             }
         }
-
-        rootPath = System.getProperty("user.dir");
-        File alterSchema = new File(StringUtils.join(rootPath, "/src/" , "alterSchema.sql"));
-        alterSchema.createNewFile();
-        writer = new BufferedWriter(new FileWriter(alterSchema));
-        writer.write(stringJoiner.toString());
-        writer.close();
-
     }
 
-    public void executeAnddestroyScripts() {
-
-
-        applicationContext.getBean("dataSourceInitializer");
-
-        String rootPath = System.getProperty("user.dir");
-        File schemaSQL = new File(StringUtils.join(rootPath, "/src/" , "schema.sql"));
-        File alterSchema = new File(StringUtils.join(rootPath, "/src/" , "alterSchema.sql"));
-        File dataSQL = new File(StringUtils.join(rootPath, "/src/" , "data.sql"));
-
-        schemaSQL.delete();
-        alterSchema.delete();
-        dataSQL.delete();
-
-    }
+//    public void executeAnddestroyScripts() {
+//
+//
+//        applicationContext.getBean("dataSourceInitializer");
+//
+//        String rootPath = System.getProperty("user.dir");
+//        File schemaSQL = new File(StringUtils.join(rootPath, "/src/" , "schema.sql"));
+//        File alterSchema = new File(StringUtils.join(rootPath, "/src/" , "alterSchema.sql"));
+//        File dataSQL = new File(StringUtils.join(rootPath, "/src/" , "data.sql"));
+//
+//        schemaSQL.delete();
+//        alterSchema.delete();
+//        dataSQL.delete();
+//
+//    }
 
 
 }
