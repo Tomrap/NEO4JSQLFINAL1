@@ -63,28 +63,6 @@ public class SpringConfig {
     }
 
 
-    @Lazy
-    @Bean
-    public ResourceDatabasePopulator resourceDatabasePopulator() {
-        String rootPath = System.getProperty("user.dir");
-        File schemaSQL = new File(StringUtils.join(rootPath, "/src/" , "schema.sql"));
-        File dataSQL = new File(StringUtils.join(rootPath, "/src/" , "data.sql"));
-        File alterSchemaSQL = new File(StringUtils.join(rootPath, "/src/" , "alterSchema.sql"));
-        FileSystemResource schemaSQLFile = new FileSystemResource(schemaSQL);
-        FileSystemResource dataSQLFile = new FileSystemResource(dataSQL);
-        FileSystemResource alterSchemaSQLFile = new FileSystemResource(alterSchemaSQL);
-        return new ResourceDatabasePopulator(schemaSQLFile,dataSQLFile,alterSchemaSQLFile);
-    }
-
-    @Lazy
-    @Bean
-    public DataSourceInitializer dataSourceInitializer(DataSource dataSource, ResourceDatabasePopulator resourceDatabasePopulator) {
-        DataSourceInitializer dataSourceInitializer = new DataSourceInitializer();
-        dataSourceInitializer.setDataSource(dataSource);
-        dataSourceInitializer.setDatabasePopulator(resourceDatabasePopulator);
-        return dataSourceInitializer;
-    }
-
     //NEO4J to SQL - path to NEO4J database
     @Lazy
     @Bean
