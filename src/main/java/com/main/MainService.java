@@ -56,17 +56,11 @@ public class MainService {
 
         GraphDetail graphDetail = graphToSQLConverter.read();
         List<GraphToSQLTableDetail> schema = sqlSchemaCreator.createSchema(graphDetail);
-        sqlConverter.createSQLSchema(schema);
+        sqlConverter.createSQLTables(schema);
         Map<String, Map<Integer, TableRow>> allRows = graphToSQLConverter.convertGraphDetailsToTableRows(graphDetail, schema);
-        sqlConverter.createSQLRows(allRows);
-        sqlConverter.createFOreignKeysConstraints(schema);
-//        sqlConverter.executeAnddestroyScripts();
+        sqlConverter.createAndInsertSQLRows(allRows);
+        sqlConverter.createForeignKeysConstraints(schema);
 
-    }
-
-    public void schemaCreation() {
-
-        System.out.println("Yes");
     }
 
 }

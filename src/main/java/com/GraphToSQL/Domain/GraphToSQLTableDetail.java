@@ -29,5 +29,4 @@ public class GraphToSQLTableDetail extends TableDetail {
         this.columnsAndTypes = columnsAndTypes;
     }
 
-
 }
