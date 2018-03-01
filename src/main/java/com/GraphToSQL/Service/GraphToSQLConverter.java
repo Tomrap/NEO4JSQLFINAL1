@@ -1,8 +1,7 @@
-package com.service;
+package com.GraphToSQL.Service;
 
-import com.Domain.*;
-import com.dao.NEO4JReaderDao;
-import org.neo4j.cypher.internal.frontend.v2_3.symbols.RelationshipType;
+import com.GraphToSQL.Dao.GraphReaderDao;
+import com.GraphToSQL.Domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -13,22 +12,22 @@ import java.util.*;
  * Created by John on 2018-02-18.
  */
 @Service
-public class GraphReader {
+public class GraphToSQLConverter {
 
     @Autowired
     @Lazy
-    private NEO4JReaderDao neo4JReaderDao;
+    private GraphReaderDao graphReaderDao;
 
     public GraphDetail read() {
 
-        return neo4JReaderDao.read();
+        return graphReaderDao.readGraph();
     }
 
 
-    public Map<String, Map<Integer, TableRow>> convertGraphDetailsToTableRows(GraphDetail graphDetail, List<TableDetail> schema) {
+    public Map<String, Map<Integer, TableRow>> convertGraphDetailsToTableRows(GraphDetail graphDetail, List<GraphToSQLTableDetail> schema) {
         Map<String, Map<Integer, TableRow>> allRows = new HashMap<>();
-        graphDetail.assignPrimaryKeysToNodes();
-        Map<String, Map<Long, MyNode>> nodesWithoutAnyForeignKeys = graphDetail.nodesWithoutAnyForeignKeys(schema);
+        graphDetail.assignSQLPrimaryKeysToNodes();
+        Map<String, Map<Long, MyNode>> nodesWithoutAnyForeignKeys = getNodesWithoutAnyForeignKeys(schema,graphDetail.getAllMyNodes());
 
         for (Map.Entry<String, Map<Long, MyNode>> element : nodesWithoutAnyForeignKeys.entrySet()) {
 
@@ -78,6 +77,19 @@ public class GraphReader {
             }
         }
         return allRows;
+    }
+
+    private Map<String, Map<Long, MyNode>> getNodesWithoutAnyForeignKeys(List<GraphToSQLTableDetail> list, Map<String,Map<Long,MyNode>> allMyNodes) {
+
+        Map<String, Map<Long, MyNode>> nodes = new HashMap<>();
+        for(Map.Entry<String, Map<Long, MyNode>> element: allMyNodes.entrySet()) {
+            Optional<GraphToSQLTableDetail> first = list.stream().filter(o -> o.getTableName().equals(element.getKey())).findFirst();
+            GraphToSQLTableDetail SQLtoGraphTableDetail = first.get();
+            if(SQLtoGraphTableDetail.getGraphFks().size() == 0) {
+                nodes.put(element.getKey(),element.getValue());
+            }
+        }
+        return nodes;
     }
 
     private void calculateForeignKeys(Map<String, Map<Integer, TableRow>> allRows, String firstNodeLabel, String secondNodeLabel, MyNode firstNode, MyNode secondNode  ) {

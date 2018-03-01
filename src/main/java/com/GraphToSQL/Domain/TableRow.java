@@ -1,4 +1,6 @@
-package com.Domain;
+package com.GraphToSQL.Domain;
+
+import com.GraphToSQL.Domain.MyNode;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.Domain;
+package com.GraphToSQL.Domain;
 
 import java.util.Map;
 
@@ -21,6 +21,7 @@ public class MyRelationship {
         return secondNode;
     }
 
+    //TODO read properties from relationships as well
     public Map<String, Object> getValues() {
         return values;
     }

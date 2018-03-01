@@ -1,7 +1,7 @@
-package com.service;
+package com.SQLToGraph.Service;
 
-import com.Domain.TableDetail;
-import com.dao.SQLImportDao;
+import com.SQLToGraph.Domain.SQLtoGraphTableDetail;
+import com.SQLToGraph.Dao.SQLImportDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import schemacrawler.schema.*;
@@ -23,11 +23,11 @@ public class SQLSchemaReader {
     @Autowired
     private SQLImportDao SQLImportDao;
 
-    public List<TableDetail> extractSchema() throws SQLException, SchemaCrawlerException {
+    public List<SQLtoGraphTableDetail> extractSchema() throws SQLException, SchemaCrawlerException {
 
-        final String schemaName = TableDetail.schemaName;
+        final String schemaName = SQLtoGraphTableDetail.schemaName;
 
-        ArrayList<TableDetail> tableList = new ArrayList<TableDetail>();
+        ArrayList<SQLtoGraphTableDetail> tableList = new ArrayList<SQLtoGraphTableDetail>();
 
         final SchemaCrawlerOptions options = new SchemaCrawlerOptions();
         options.setSchemaInfoLevel(SchemaInfoLevel.standard());
@@ -39,23 +39,23 @@ public class SQLSchemaReader {
         for (final Table table : database.getTables()) {
 
             if(table.getTableType().equals(TableType.TABLE)) {
-                TableDetail tableDetail = new TableDetail();
+                SQLtoGraphTableDetail SQLtoGraphTableDetail = new SQLtoGraphTableDetail();
 
                 String tableName = table.getName();
-                tableDetail.setTableName(tableName);
-                tableDetail.setPk(getPrimaryKeys(table));
-                tableDetail.setFks(getForeignKeys(table));
-                tableDetail.setFields(getColumns(table,tableDetail));
+                SQLtoGraphTableDetail.setTableName(tableName);
+                SQLtoGraphTableDetail.setPk(getPrimaryKeys(table));
+                SQLtoGraphTableDetail.setFks(getForeignKeys(table));
+                SQLtoGraphTableDetail.setFields(getColumns(table, SQLtoGraphTableDetail));
 
-                tableList.add(tableDetail);
+                tableList.add(SQLtoGraphTableDetail);
 
-                TableDetail.addtoTables(tableDetail);
+                SQLtoGraphTableDetail.addtoTables(SQLtoGraphTableDetail);
             }
         }
         return tableList;
     }
 
-    private List<String> getColumns(Table table, TableDetail tableDetail) {
+    private List<String> getColumns(Table table, SQLtoGraphTableDetail SQLtoGraphTableDetail) {
 
         List<Column> columns = table.getColumns();
         Collection<String> fields = new ArrayList<>(columns.size());
@@ -65,8 +65,8 @@ public class SQLSchemaReader {
             fields.add(columnName);
         }
 
-        fields.removeAll(tableDetail.getForeignKeyColumns());
-        fields.removeAll(tableDetail.getPk());
+        fields.removeAll(SQLtoGraphTableDetail.getForeignKeyColumns());
+        fields.removeAll(SQLtoGraphTableDetail.getPk());
 
         return new ArrayList<>(fields);
     }

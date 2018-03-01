@@ -1,10 +1,10 @@
 package com.dao;
 
-import com.Domain.MyRelationshipType;
+import com.GraphToSQL.Domain.MyRelationshipType;
 import com.config.SpringConfig;
 import com.config.WebConfig;
 import com.controller.HomeController;
-import com.service.MainService;
+import com.main.MainService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package com.Domain;
+package com.GraphToSQL.Domain;
 
 import java.util.Map;
 

@@ -1,9 +1,9 @@
-package com.service;
+package com.GraphToSQL.Service;
 
-import com.Domain.MyNode;
-import com.Domain.TableDetail;
-import com.Domain.TableRow;
-import com.dao.SQLImportDao;
+import com.GraphToSQL.Domain.GraphToSQLTableDetail;
+import com.GraphToSQL.Domain.MyNode;
+import com.GraphToSQL.Domain.TableRow;
+import com.SQLToGraph.Dao.SQLImportDao;
 import org.jooq.*;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -56,7 +55,7 @@ public class SQLConverter{
     public void createSQLRows(Map<String, Map<Integer, TableRow>> allRows) throws SQLException, IOException {
 
         Connection connection = SQLImportDao.getJdbcTemplate().getDataSource().getConnection();
-        connection.setCatalog(TableDetail.schemaName);
+        connection.setCatalog(GraphToSQLTableDetail.schemaName);
         DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
         Settings settings = create.settings();
         settings.setDebugInfoOnStackTrace(false);
@@ -98,36 +97,36 @@ public class SQLConverter{
 
     }
 
-    public void createSQLSchema(List<TableDetail> tableDetails) throws SQLException, IOException {
+    public void createSQLSchema(List<GraphToSQLTableDetail> graphToSQLTableDetails) throws SQLException, IOException {
 
         Connection connection = SQLImportDao.getJdbcTemplate().getDataSource().getConnection();
-        String schema = TableDetail.schemaName;
+        String schema = GraphToSQLTableDetail.schemaName;
         DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
         create.createSchema(schema).execute();
-        connection.setCatalog(TableDetail.schemaName);
+        connection.setCatalog(schema);
 
-        for(TableDetail tableDetail : tableDetails) {
+        for(GraphToSQLTableDetail graphToSQLTableDetail : graphToSQLTableDetails) {
 
-            CreateTableAsStep<Record> table = create.createTable(tableDetail.getTableName());
+            CreateTableAsStep<Record> table = create.createTable(graphToSQLTableDetail.getTableName());
 
             //TODO currently name of the primary key is the same as the name of the table and this is used later!
             //copy pk
-            for (String element : tableDetail.getPk()) {
+            for (String element : graphToSQLTableDetail.getPk()) {
                 table.column(element+"_ID", SQLDataType.INTEGER.nullable(false));
             }
 
             //copy fields
-            for (Map.Entry<String, Object> element : tableDetail.getColumnsAndTypes().entrySet()) {
+            for (Map.Entry<String, Object> element : graphToSQLTableDetail.getColumnsAndTypes().entrySet()) {
                 table.column(element.getKey(), inferType(element.getValue()));
             }
 
 
-            for(String element:tableDetail.getGraphFks()) {
+            for(String element: graphToSQLTableDetail.getGraphFks()) {
                 table.column(element+"_ID",  SQLDataType.INTEGER).getSQL();
             }
 
             //set up Pk Constraint
-            for (String element : tableDetail.getPk()) {
+            for (String element : graphToSQLTableDetail.getPk()) {
                 ((CreateTableColumnStep) table).constraints(constraint(element+"_ID").primaryKey(element+"_ID"));
             }
 
@@ -135,18 +134,18 @@ public class SQLConverter{
         }
     }
 
-    public void createFOreignKeysConstraints(List<TableDetail> tableDetails) throws SQLException {
+    public void createFOreignKeysConstraints(List<GraphToSQLTableDetail> graphToSQLTableDetails) throws SQLException {
 
         Connection connection = SQLImportDao.getJdbcTemplate().getDataSource().getConnection();
-        connection.setCatalog(TableDetail.schemaName);
+        connection.setCatalog(GraphToSQLTableDetail.schemaName);
         DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
 
 
-        for (TableDetail tableDetail : tableDetails) {
+        for (GraphToSQLTableDetail graphToSQLTableDetail : graphToSQLTableDetails) {
 
             //copy fks
-            for (String element : tableDetail.getGraphFks()) {
-                create.alterTable(tableDetail.getTableName()).add(constraint(tableDetail.getTableName() + "_" + element).foreignKey(element + "_ID").references(element, element + "_ID")).execute();
+            for (String element : graphToSQLTableDetail.getGraphFks()) {
+                create.alterTable(graphToSQLTableDetail.getTableName()).add(constraint(graphToSQLTableDetail.getTableName() + "_" + element).foreignKey(element + "_ID").references(element, element + "_ID")).execute();
             }
         }
     }

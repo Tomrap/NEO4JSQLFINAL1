@@ -35,15 +35,6 @@ import java.sql.SQLException;
 })
 public class SpringConfig {
 
-    //TODO JNDI LOOKUP - PROBLEMS WITH TESTING, JNDI RESOURCE NOT AVAILABLE,ALREADY ADDED DATABASE RESOURCE TO TOMCAT CONTEXT.XML AND RESOURCE-LINK TO WEB.XML
-//    @Bean
-//    public DataSource getDataSource() throws NamingException {
-//        JndiTemplate jndiTemplate = new JndiTemplate();
-//        DataSource dataSource
-//                = (DataSource) jndiTemplate.lookup("java:comp/env/jdbc/sakila");
-//        return dataSource;
-//    }
-
     //SQL to NEO4J - path to NEO4J database
     @Lazy
     @Bean

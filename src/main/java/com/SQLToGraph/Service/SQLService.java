@@ -1,6 +1,6 @@
-package com.service;
+package com.SQLToGraph.Service;
 
-import com.Domain.TableDetail;
+import com.SQLToGraph.Domain.SQLtoGraphTableDetail;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -19,11 +19,11 @@ public class SQLService {
     private static final Logger logger = Logger.getLogger(SQLService.class);
 
     @Autowired @Lazy
-    private com.dao.SQLImportDao SQLImportDao;
+    private com.SQLToGraph.Dao.SQLImportDao SQLImportDao;
 
-    public List<List<Map<String, Object>>> readAllTables(List<TableDetail> tableDetailList) throws SQLException {
+    public List<List<Map<String, Object>>> readAllTables(List<SQLtoGraphTableDetail> SQLtoGraphTableDetailList) throws SQLException {
 
-        return SQLImportDao.readAllTables(tableDetailList);
+        return SQLImportDao.readAllTables(SQLtoGraphTableDetailList);
     }
 
 }

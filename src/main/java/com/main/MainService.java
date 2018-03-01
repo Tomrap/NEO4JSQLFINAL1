@@ -1,8 +1,14 @@
-package com.service;
+package com.main;
 
-import com.Domain.GraphDetail;
-import com.Domain.TableDetail;
-import com.Domain.TableRow;
+import com.GraphToSQL.Domain.GraphDetail;
+import com.GraphToSQL.Domain.GraphToSQLTableDetail;
+import com.SQLToGraph.Domain.SQLtoGraphTableDetail;
+import com.GraphToSQL.Domain.TableRow;
+import com.GraphToSQL.Service.GraphToSQLConverter;
+import com.GraphToSQL.Service.SQLConverter;
+import com.GraphToSQL.Service.SQLSchemaCreator;
+import com.SQLToGraph.Service.GraphGenerator;
+import com.SQLToGraph.Service.SQLService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,10 +34,10 @@ public class MainService {
     private SQLService sqlService;
 
     @Autowired
-    private GraphReader graphReader;
+    private GraphToSQLConverter graphToSQLConverter;
 
     @Autowired
-    private SQLSchemaReader SQLSchemaReader;
+    private com.SQLToGraph.Service.SQLSchemaReader SQLSchemaReader;
 
     @Autowired
     private SQLSchemaCreator sqlSchemaCreator;
@@ -41,17 +47,17 @@ public class MainService {
 
     public void convertSQLtoNEO4J() throws SQLException, SchemaCrawlerException, IOException {
 
-        List<TableDetail> tables = SQLSchemaReader.extractSchema();
+        List<SQLtoGraphTableDetail> tables = SQLSchemaReader.extractSchema();
         List<List<Map<String, Object>>> allData = sqlService.readAllTables(tables);
         graphGenerator.generate(allData,tables);
     }
 
     public void convertNEO4JtoSQL() throws SQLException, IOException {
 
-        GraphDetail graphDetail = graphReader.read();
-        List<TableDetail> schema = sqlSchemaCreator.createSchema(graphDetail);
+        GraphDetail graphDetail = graphToSQLConverter.read();
+        List<GraphToSQLTableDetail> schema = sqlSchemaCreator.createSchema(graphDetail);
         sqlConverter.createSQLSchema(schema);
-        Map<String, Map<Integer, TableRow>> allRows = graphReader.convertGraphDetailsToTableRows(graphDetail, schema);
+        Map<String, Map<Integer, TableRow>> allRows = graphToSQLConverter.convertGraphDetailsToTableRows(graphDetail, schema);
         sqlConverter.createSQLRows(allRows);
         sqlConverter.createFOreignKeysConstraints(schema);
 //        sqlConverter.executeAnddestroyScripts();

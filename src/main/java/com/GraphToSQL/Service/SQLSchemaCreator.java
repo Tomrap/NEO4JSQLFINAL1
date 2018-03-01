@@ -1,6 +1,6 @@
-package com.service;
+package com.GraphToSQL.Service;
 
-import com.Domain.*;
+import com.GraphToSQL.Domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -11,9 +11,9 @@ import java.util.*;
 @Service
 public class SQLSchemaCreator {
 
-    public List<TableDetail> createSchema(GraphDetail graphDetail) {
+    public List<GraphToSQLTableDetail> createSchema(GraphDetail graphDetail) {
 
-        List<TableDetail> tableDetails = new ArrayList<>();
+        List<GraphToSQLTableDetail> graphToSQLTableDetails = new ArrayList<>();
 
 
         //find fks
@@ -64,42 +64,42 @@ public class SQLSchemaCreator {
                 columnAndType.putAll(node.getValues());
             }
 
-            TableDetail tableDetail = new TableDetail();
-            tableDetail.setTableName(element.getKey());
+            GraphToSQLTableDetail graphToSQLTableDetail = new GraphToSQLTableDetail();
+            graphToSQLTableDetail.setTableName(element.getKey());
             //TODO in case of junction table there might be composite primary key
             List<String> pks = new ArrayList<>();
             pks.add(element.getKey());
-            tableDetail.setPk(pks);
-            tableDetail.setColumnsAndTypes(columnAndType);
+            graphToSQLTableDetail.setPk(pks);
+            graphToSQLTableDetail.setColumnsAndTypes(columnAndType);
             //TODO change to optional
             //TODO in case of composite primary key there might be composite foreign key
             List<String> remove = foreigKeys.remove(element.getKey());
             if(remove == null) {
-                tableDetail.setGraphFks(new ArrayList<>());
+                graphToSQLTableDetail.setGraphFks(new ArrayList<>());
             } else {
-                tableDetail.setGraphFks(remove);
+                graphToSQLTableDetail.setGraphFks(remove);
             }
 
-            tableDetails.add(tableDetail);
+            graphToSQLTableDetails.add(graphToSQLTableDetail);
         }
 
         for (Map.Entry<String, List<String>> element : foreigKeys.entrySet()) {
-            TableDetail tableDetail = new TableDetail();
-            tableDetail.setTableName(element.getKey());
+            GraphToSQLTableDetail graphToSQLTableDetail = new GraphToSQLTableDetail();
+            graphToSQLTableDetail.setTableName(element.getKey());
             List<String> pks = new ArrayList<>();
             pks.add(element.getKey());
-            tableDetail.setPk(pks);
-            tableDetail.setColumnsAndTypes(new HashMap<>());
+            graphToSQLTableDetail.setPk(pks);
+            graphToSQLTableDetail.setColumnsAndTypes(new HashMap<>());
             List<String> remove = foreigKeys.remove(element.getKey());
             //TODO change to optional
             if(remove == null) {
-                tableDetail.setGraphFks(new ArrayList<>());
+                graphToSQLTableDetail.setGraphFks(new ArrayList<>());
             } else {
-                tableDetail.setGraphFks(remove);
+                graphToSQLTableDetail.setGraphFks(remove);
             }
-            tableDetails.add(tableDetail);
+            graphToSQLTableDetails.add(graphToSQLTableDetail);
         }
-        return tableDetails;
+        return graphToSQLTableDetails;
 
 
     }

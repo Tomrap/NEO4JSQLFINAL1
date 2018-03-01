@@ -16,59 +16,32 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Relational to Neo4j Importer.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.Domain;
+package com.SQLToGraph.Domain;
+
+import com.main.TableDetail;
 
 import java.util.*;
 
-public class TableDetail {
+public class SQLtoGraphTableDetail extends TableDetail {
 
+    private static final Map<String, SQLtoGraphTableDetail> TABLES = new LinkedHashMap<>();
+    public static final String schemaName = "sakila";
 
-    //TODO split into two objects
-    private static final Map<String, TableDetail> TABLES = new LinkedHashMap<>();
-    public static final String schemaName = "sakila1";
-
-    private  List<String> pk;
-    private  String tableName;
     private  List<String> fields;
-    private  List<String> graphFks;
     private   Map<List<String>, String> fks;
     private int firstIndex;
-    private Map<String, Object> columnsAndTypes;
-
-    public Map<String, Object> getColumnsAndTypes() {
-        return columnsAndTypes;
-    }
-
-    public void setColumnsAndTypes(Map<String, Object> columnsAndTypes) {
-        this.columnsAndTypes = columnsAndTypes;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public List<String> getPk() {
-        return pk;
-    }
+    private HashMap<Integer,Integer> mappingMap;
 
     public List<String> getFields() {
         return fields;
     }
 
-    public Map<List<String>, String> getFks() {
-        return fks;
-    }
-
-    public void setPk(List<String> pk) {
-        this.pk = pk;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
-
     public void setFields(List<String> fields) {
         this.fields = fields;
+    }
+
+    public Map<List<String>, String> getFks() {
+        return fks;
     }
 
     public void setFks(Map<List<String>, String> fks) {
@@ -83,14 +56,6 @@ public class TableDetail {
         this.firstIndex = firstIndex;
     }
 
-    public List<String> getGraphFks() {
-        return graphFks;
-    }
-
-    public void setGraphFks(List<String> graphFks) {
-        this.graphFks = graphFks;
-    }
-
     public HashMap<Integer, Integer> getMappingMap() {
         return mappingMap;
     }
@@ -99,13 +64,11 @@ public class TableDetail {
         this.mappingMap = mappingMap;
     }
 
-    private HashMap<Integer,Integer> mappingMap;
-
-    public static void addtoTables(TableDetail tableDetail) {
-        TABLES.put(tableDetail.getTableName(),tableDetail);
+    public static void addtoTables(SQLtoGraphTableDetail SQLtoGraphTableDetail) {
+        TABLES.put(SQLtoGraphTableDetail.getTableName(), SQLtoGraphTableDetail);
     }
 
-    public static TableDetail getTable(String tableName) {
+    public static SQLtoGraphTableDetail getTable(String tableName) {
         return TABLES.get(tableName);
     }
 
@@ -118,15 +81,4 @@ public class TableDetail {
         }
         return list;
     }
-
-    @Override
-    public String toString() {
-        return "TableInfo{" +
-                ", tableName='" + tableName + '\'' +
-                ", pk='" + pk + '\'' +
-                ", fields=" + fields +
-                ", fks=" + fks +
-                '}';
-    }
-
 }

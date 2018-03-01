@@ -1,6 +1,6 @@
-package com.dao;
+package com.SQLToGraph.Dao;
 
-import com.Domain.TableDetail;
+import com.SQLToGraph.Domain.SQLtoGraphTableDetail;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,14 +32,14 @@ public class SQLImportDao {
     private JdbcTemplate jdbcTemplate;
 
 
-    public List<List<Map<String, Object>>> readAllTables(List<TableDetail> tableDetailList) throws SQLException {
+    public List<List<Map<String, Object>>> readAllTables(List<SQLtoGraphTableDetail> SQLtoGraphTableDetailList) throws SQLException {
 
         logger.info("Started readAllTables for database");
 
         List<List<Map<String, Object>>> allData = new ArrayList<>();
 
-        for(TableDetail tableDetail: tableDetailList) {
-            allData.add(readTableData(tableDetail));
+        for(SQLtoGraphTableDetail SQLtoGraphTableDetail : SQLtoGraphTableDetailList) {
+            allData.add(readTableData(SQLtoGraphTableDetail));
         }
 
         logger.info("Finished readAllTables for database");
@@ -48,17 +48,17 @@ public class SQLImportDao {
 
     }
 
-    private List<Map<String, Object>> readTableData(TableDetail table) throws SQLException {
+    private List<Map<String, Object>> readTableData(SQLtoGraphTableDetail table) throws SQLException {
 
         logger.info("Started readTableData for " + table.getTableName());
 
-        String tableName = TableDetail.schemaName+"."+ table.getTableName();
+        String tableName = SQLtoGraphTableDetail.schemaName+"."+ table.getTableName();
 
         String query = String.format("SELECT * from " + tableName);
 
         List<Map<String, Object>> rows = getJdbcTemplate().queryForList(query);
 
-//        return jdbcTemplate.getDataSource().getConnection().createStatement().executeQuery("SELECT * from " + TableDetail.schemaName+"."+ table.getTableName());
+//        return jdbcTemplate.getDataSource().getConnection().createStatement().executeQuery("SELECT * from " + SQLtoGraphTableDetail.schemaName+"."+ table.getTableName());
 
         logger.info("Finished readTableData for " + table.getTableName());
 
