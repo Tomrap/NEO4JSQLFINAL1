@@ -38,7 +38,6 @@ public class SQLSchemaReader {
 
         for (final Table table : database.getTables()) {
 
-            //todo consider non tables (views)
             if(table.getTableType().equals(TableType.TABLE)) {
                 TableDetail tableDetail = new TableDetail();
 

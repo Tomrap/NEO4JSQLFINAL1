@@ -56,15 +56,21 @@ public class SQLSchemaCreator {
 
         Map<String, Map<Long, MyNode>> allMyNodes = graphDetail.getAllMyNodes();
         for(Map.Entry<String, Map<Long, MyNode>> element: allMyNodes.entrySet()) {
-            MyNode exampleNode = element.getValue().values().iterator().next();
+
+            //Important remark in NEO4J there is no NULL so if property exist it has a value
+
+            Map<String, Object> columnAndType = new HashMap<>();
+            for(MyNode node : element.getValue().values()) {
+                columnAndType.putAll(node.getValues());
+            }
+
             TableDetail tableDetail = new TableDetail();
             tableDetail.setTableName(element.getKey());
             //TODO in case of junction table there might be composite primary key
             List<String> pks = new ArrayList<>();
-            pks.add(exampleNode.getPrimaryKeyName());
+            pks.add(element.getKey());
             tableDetail.setPk(pks);
-            //TODO what if there is NULL in nay column - cannot extract type
-            tableDetail.setColumnsAndTypes(exampleNode.getValues());
+            tableDetail.setColumnsAndTypes(columnAndType);
             //TODO change to optional
             //TODO in case of composite primary key there might be composite foreign key
             List<String> remove = foreigKeys.remove(element.getKey());
@@ -73,8 +79,6 @@ public class SQLSchemaCreator {
             } else {
                 tableDetail.setGraphFks(remove);
             }
-
-
 
             tableDetails.add(tableDetail);
         }

@@ -42,7 +42,7 @@ public class NEO4JReaderDao {
 
                 String oneLabel = StreamSupport.stream(labels.spliterator(), false).map(Object::toString).collect(Collectors.joining(""));
 
-                MyNode myNode = new MyNode(oneLabel,node.getAllProperties());
+                MyNode myNode = new MyNode(node.getAllProperties());
 
                 allMyNodes.computeIfAbsent(oneLabel, k -> new HashMap<>()).put(node.getId(),myNode);
 

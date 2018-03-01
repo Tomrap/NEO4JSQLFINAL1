@@ -7,7 +7,6 @@ import java.util.Map;
  */
 public class MyNode {
 
-    private String primaryKeyName;
     private Map<String,Object> values;
     private int sqlID;
 
@@ -19,16 +18,11 @@ public class MyNode {
         this.sqlID = sqlID;
     }
 
-    public String getPrimaryKeyName() {
-        return primaryKeyName;
-    }
-
     public Map<String, Object> getValues() {
         return values;
     }
 
-    public MyNode(String primaryKeyName, Map<String, Object> values) {
-        this.primaryKeyName = primaryKeyName;
+    public MyNode(Map<String, Object> values) {
         this.values = values;
     }
 

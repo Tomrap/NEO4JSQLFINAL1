@@ -5,17 +5,12 @@ import com.Domain.TableDetail;
 import com.Domain.TableRow;
 import com.dao.SQLImportDao;
 import org.jooq.*;
+import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
-import org.jooq.tools.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Blob;
@@ -29,48 +24,51 @@ import static org.jooq.impl.DSL.*;
  * Created by John on 2018-02-23.
  */
 @Service
-public class SQLConverter implements ApplicationContextAware {
+public class SQLConverter{
 
-    private ApplicationContext applicationContext;
-
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
 
     @Autowired
     private SQLImportDao SQLImportDao;
 
-    private DataType convertValue(Object value) {
+    private DataType inferType(Object value) {
 
-        if(value instanceof Integer) {
+        if(value instanceof Boolean) {
+           return SQLDataType.BIT;
+        }
+        if(value instanceof Integer || value instanceof Byte || value instanceof Short ) {
             return SQLDataType.INTEGER;
         }
         if(value instanceof String) {
             return SQLDataType.VARCHAR.length(130);
         }
-        if (value instanceof Date) {
-            return SQLDataType.DATE;
+        if(value instanceof Float || value instanceof Double) {
+            return SQLDataType.DECIMAL(10,5);
         }
         if (value instanceof BigDecimal || value instanceof Long) return SQLDataType.BIGINT;
-        if (value instanceof Blob) {
-            return SQLDataType.BLOB;
-        }
-        //TODO make sure it never returns null
+
         return SQLDataType.BLOB;
+
+
     }
+
+
 
     public void createSQLRows(Map<String, Map<Integer, TableRow>> allRows) throws SQLException, IOException {
 
         Connection connection = SQLImportDao.getJdbcTemplate().getDataSource().getConnection();
         connection.setCatalog(TableDetail.schemaName);
         DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
+        Settings settings = create.settings();
+        settings.setDebugInfoOnStackTrace(false);
+        settings.setExecuteLogging(false);
 
-
-        List<Object> rowValues = new ArrayList<>();
-        Collection<Field<Object>> columnNames = new ArrayList<>();
-        List<InsertValuesStepN<Record>> inserts = new ArrayList<>();
+        List<Object> rowValues;
+        Collection<Field<Object>> columnNames;
+        List<InsertValuesStepN<Record>> inserts;
 
         for(Map.Entry<String, Map<Integer, TableRow>> element: allRows.entrySet()) {
+
+            inserts = new ArrayList<>();
 
             for(Map.Entry<Integer, TableRow> row: element.getValue().entrySet()) {
 
@@ -79,7 +77,7 @@ public class SQLConverter implements ApplicationContextAware {
 
                 MyNode myNode = row.getValue().getMyNode();
 
-                columnNames.add(field(myNode.getPrimaryKeyName()+"_ID"));
+                columnNames.add(field(element.getKey()+"_ID"));
                 rowValues.add(myNode.getSqlID());
 
                 for(Map.Entry<String, Object> myNodeValue: myNode.getValues().entrySet()) {
@@ -95,18 +93,8 @@ public class SQLConverter implements ApplicationContextAware {
 
                 inserts.add(create.insertInto(table(element.getKey()), columnNames).values(rowValues));
             }
-
+            create.batch(inserts).execute();
         }
-        create.batch(inserts).execute();
-
-//        System.out.println(stringJoiner.toString());
-//
-//        String rootPath = System.getProperty("user.dir");
-//        File dataSQL = new File(StringUtils.join(rootPath, "/src/" , "data.sql"));
-//        dataSQL.createNewFile();
-//        BufferedWriter writer = new BufferedWriter(new FileWriter(dataSQL));
-//        writer.write(stringJoiner.toString());
-//        writer.close();
 
     }
 
@@ -130,7 +118,7 @@ public class SQLConverter implements ApplicationContextAware {
 
             //copy fields
             for (Map.Entry<String, Object> element : tableDetail.getColumnsAndTypes().entrySet()) {
-                table.column(element.getKey(), convertValue(element.getValue()));
+                table.column(element.getKey(), inferType(element.getValue()));
             }
 
 
@@ -145,24 +133,6 @@ public class SQLConverter implements ApplicationContextAware {
 
             ((CreateTableColumnStep) table).execute();
         }
-
-//        String rootPath = System.getProperty("user.dir");
-//        File schemaSQL = new File(StringUtils.join(rootPath, "/src/" , "schema.sql"));
-//        schemaSQL.createNewFile();
-//        BufferedWriter writer = new BufferedWriter(new FileWriter(schemaSQL));
-//        writer.write(stringJoiner.toString());
-//        writer.close();
-
-
-//        createFOreignKeysConstraints(tableDetails, create, schema);
-
-//        rootPath = System.getProperty("user.dir");
-//        File alterSchema = new File(StringUtils.join(rootPath, "/src/" , "alterSchema.sql"));
-//        alterSchema.createNewFile();
-//        writer = new BufferedWriter(new FileWriter(alterSchema));
-//        writer.write(stringJoiner.toString());
-//        writer.close();
-
     }
 
     public void createFOreignKeysConstraints(List<TableDetail> tableDetails) throws SQLException {
@@ -171,29 +141,13 @@ public class SQLConverter implements ApplicationContextAware {
         connection.setCatalog(TableDetail.schemaName);
         DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
 
-        for(TableDetail tableDetail : tableDetails) {
+
+        for (TableDetail tableDetail : tableDetails) {
+
             //copy fks
-            for(String element:tableDetail.getGraphFks()) {
-                create.alterTable(tableDetail.getTableName()).add(constraint(tableDetail.getTableName()+"_"+element).foreignKey(element+"_ID").references(element,element+"_ID")).execute();
+            for (String element : tableDetail.getGraphFks()) {
+                create.alterTable(tableDetail.getTableName()).add(constraint(tableDetail.getTableName() + "_" + element).foreignKey(element + "_ID").references(element, element + "_ID")).execute();
             }
         }
     }
-
-//    public void executeAnddestroyScripts() {
-//
-//
-//        applicationContext.getBean("dataSourceInitializer");
-//
-//        String rootPath = System.getProperty("user.dir");
-//        File schemaSQL = new File(StringUtils.join(rootPath, "/src/" , "schema.sql"));
-//        File alterSchema = new File(StringUtils.join(rootPath, "/src/" , "alterSchema.sql"));
-//        File dataSQL = new File(StringUtils.join(rootPath, "/src/" , "data.sql"));
-//
-//        schemaSQL.delete();
-//        alterSchema.delete();
-//        dataSQL.delete();
-//
-//    }
-
-
 }

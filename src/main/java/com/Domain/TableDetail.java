@@ -22,6 +22,8 @@ import java.util.*;
 
 public class TableDetail {
 
+
+    //TODO split into two objects
     private static final Map<String, TableDetail> TABLES = new LinkedHashMap<>();
     public static final String schemaName = "sakila1";
 
