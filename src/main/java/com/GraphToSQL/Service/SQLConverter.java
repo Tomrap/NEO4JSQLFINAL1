@@ -25,6 +25,7 @@ import static org.jooq.impl.DSL.*;
 @Service
 public class SQLConverter{
 
+    private String id = "_ID";
 
     @Autowired
     private SQLImportDao SQLImportDao;
@@ -72,7 +73,7 @@ public class SQLConverter{
 
                 MyNode myNode = row.getValue().getMyNode();
 
-                columnNames.add(field(element.getKey()+"_ID"));
+                columnNames.add(field(element.getKey()+id));
                 rowValues.add(myNode.getSqlID());
 
                 for(Map.Entry<String, Object> myNodeValue: myNode.getValues().entrySet()) {
@@ -82,7 +83,7 @@ public class SQLConverter{
                 }
 
                 for(Map.Entry<String, Integer> foreignKey : row.getValue().getForeignKeys().entrySet()) {
-                    columnNames.add(field(foreignKey.getKey()+"_ID"));
+                    columnNames.add(field(foreignKey.getKey()+id));
                     rowValues.add(foreignKey.getValue());
                 }
 
@@ -104,9 +105,8 @@ public class SQLConverter{
 
             CreateTableAsStep<Record> table = create.createTable(graphToSQLTableDetail.getTableName());
 
-            //TODO currently name of the primary key is the same as the name of the table and this is used later!
             for (String element : graphToSQLTableDetail.getPk()) {
-                table.column(element+"_ID", SQLDataType.INTEGER.nullable(false));
+                table.column(element+id, SQLDataType.INTEGER.nullable(false));
             }
 
             for (Map.Entry<String, Object> element : graphToSQLTableDetail.getColumnsAndTypes().entrySet()) {
@@ -114,11 +114,11 @@ public class SQLConverter{
             }
 
             for(String element: graphToSQLTableDetail.getGraphFks()) {
-                table.column(element+"_ID",  SQLDataType.INTEGER).getSQL();
+                table.column(element+id,  SQLDataType.INTEGER).getSQL();
             }
 
             for (String element : graphToSQLTableDetail.getPk()) {
-                ((CreateTableColumnStep) table).constraints(constraint(element+"_ID").primaryKey(element+"_ID"));
+                ((CreateTableColumnStep) table).constraints(constraint(element+id).primaryKey(element+id));
             }
 
             ((CreateTableColumnStep) table).execute();
@@ -134,8 +134,8 @@ public class SQLConverter{
         for (GraphToSQLTableDetail graphToSQLTableDetail : graphToSQLTableDetails) {
 
             for (String element : graphToSQLTableDetail.getGraphFks()) {
-                create.alterTable(graphToSQLTableDetail.getTableName()).add(constraint(graphToSQLTableDetail.getTableName() + "_" + element).foreignKey(element + "_ID")
-                        .references(element, element + "_ID")).execute();
+                create.alterTable(graphToSQLTableDetail.getTableName()).add(constraint(graphToSQLTableDetail.getTableName() + "_" + element).foreignKey(element + id)
+                        .references(element, element + id)).execute();
             }
         }
     }

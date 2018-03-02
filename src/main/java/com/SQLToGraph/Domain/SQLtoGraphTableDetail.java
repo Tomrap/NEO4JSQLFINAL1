@@ -18,11 +18,9 @@
  */
 package com.SQLToGraph.Domain;
 
-import com.main.TableDetail;
-
 import java.util.*;
 
-public class SQLtoGraphTableDetail extends TableDetail {
+public class SQLtoGraphTableDetail {
 
     private static final Map<String, SQLtoGraphTableDetail> TABLES = new LinkedHashMap<>();
     public static final String schemaName = "sakila";
@@ -30,7 +28,9 @@ public class SQLtoGraphTableDetail extends TableDetail {
     private  List<String> fields;
     private   Map<List<String>, String> fks;
     private int firstIndex;
-    private HashMap<Integer,Integer> mappingMap;
+    private HashMap<Integer, Integer> mappingMap;
+    private String tableName;
+    private List<String> pk;
 
     public List<String> getFields() {
         return fields;
@@ -71,6 +71,21 @@ public class SQLtoGraphTableDetail extends TableDetail {
     public static SQLtoGraphTableDetail getTable(String tableName) {
         return TABLES.get(tableName);
     }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+    public String getTableName() {
+        return tableName;
+    }
+
+    public List<String> getPk() {
+        return pk;
+    }
+    public void setPk(List<String> pk) {
+        this.pk = pk;
+    }
+
 
     public List<String> getForeignKeyColumns() {
 

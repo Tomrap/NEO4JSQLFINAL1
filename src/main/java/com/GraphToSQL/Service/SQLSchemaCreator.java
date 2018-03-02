@@ -31,8 +31,6 @@ public class SQLSchemaCreator {
             handleJunctionTable(graphToSQLTableDetails, foreignKeys, element);
         }
         return graphToSQLTableDetails;
-
-
     }
 
     private void handleJunctionTable(List<GraphToSQLTableDetail> graphToSQLTableDetails, Map<String, List<String>> foreignKeys, Map.Entry<String, List<String>> element) {
@@ -43,7 +41,6 @@ public class SQLSchemaCreator {
         graphToSQLTableDetail.setPk(pks);
         graphToSQLTableDetail.setColumnsAndTypes(new HashMap<>());
         List<String> remove = foreignKeys.remove(element.getKey());
-        //TODO change to optional
         if(remove == null) {
             graphToSQLTableDetail.setGraphFks(new ArrayList<>());
         } else {
@@ -67,7 +64,6 @@ public class SQLSchemaCreator {
         pks.add(nodeGroup.getKey());
         graphToSQLTableDetail.setPk(pks);
         graphToSQLTableDetail.setColumnsAndTypes(columnAndType);
-        //TODO change to optional
         //TODO in case of composite primary key there might be composite foreign key
         List<String> remove = foreignKeys.remove(nodeGroup.getKey());
         if(remove == null) {

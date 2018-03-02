@@ -1,16 +1,17 @@
 package com.GraphToSQL.Domain;
 
-import com.main.TableDetail;
-
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by John on 2018-03-01.
  */
-public class GraphToSQLTableDetail extends TableDetail {
+public class GraphToSQLTableDetail{
 
     public static final String schemaName = "sakila1";
+
+    private String tableName;
+    private List<String> pk;
 
     private List<String> graphFks;
     private Map<String, Object> columnsAndTypes;
@@ -27,6 +28,20 @@ public class GraphToSQLTableDetail extends TableDetail {
     }
     public void setColumnsAndTypes(Map<String, Object> columnsAndTypes) {
         this.columnsAndTypes = columnsAndTypes;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+    public String getTableName() {
+        return tableName;
+    }
+
+    public List<String> getPk() {
+        return pk;
+    }
+    public void setPk(List<String> pk) {
+        this.pk = pk;
     }
 
 }

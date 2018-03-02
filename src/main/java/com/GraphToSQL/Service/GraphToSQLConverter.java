@@ -14,6 +14,8 @@ import java.util.*;
 @Service
 public class GraphToSQLConverter {
 
+    private String join = "_";
+
     @Autowired
     @Lazy
     private GraphReaderDao graphReaderDao;
@@ -58,8 +60,8 @@ public class GraphToSQLConverter {
     private void createRowWithTwoForeignKeys(Map<String, Map<Integer, TableRow>> allRows, MyRelationshipType key, MyNode firstNode, MyNode secondNode) {
         //TODO do sth about the names
         TableRow tableRow;
-        if (allRows.get(key.getFirstNodeLabel() + "_" + key.getSecondNodeLabel()) != null) {
-            tableRow = allRows.get(key.getFirstNodeLabel() + "_" + key.getSecondNodeLabel()).get(firstNode.getSqlID() + secondNode.getSqlID());
+        if (allRows.get(key.getFirstNodeLabel() + join + key.getSecondNodeLabel()) != null) {
+            tableRow = allRows.get(key.getFirstNodeLabel() + join + key.getSecondNodeLabel()).get(firstNode.getSqlID() + secondNode.getSqlID());
             if (tableRow == null) {
                 tableRow = assignForeignKeysInJunctionTable(key, firstNode, secondNode);
             } else {
@@ -71,7 +73,7 @@ public class GraphToSQLConverter {
             tableRow = assignForeignKeysInJunctionTable(key, firstNode, secondNode);
         }
         //TODO introduce composite primary key
-        allRows.computeIfAbsent(key.getFirstNodeLabel() + "_" + key.getSecondNodeLabel(), k -> new HashMap<>()).put(firstNode.getSqlID() + secondNode.getSqlID(), tableRow);
+        allRows.computeIfAbsent(key.getFirstNodeLabel() + join + key.getSecondNodeLabel(), k -> new HashMap<>()).put(firstNode.getSqlID() + secondNode.getSqlID(), tableRow);
     }
 
     private TableRow assignForeignKeysInJunctionTable(MyRelationshipType key, MyNode firstNode, MyNode secondNode) {
