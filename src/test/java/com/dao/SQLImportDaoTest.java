@@ -42,10 +42,10 @@ public class SQLImportDaoTest {
 //        neo4JDao.createDb();
     }
 
-    @Test
-    public void schemaCreation() {
-        mainService.schemaCreation();
-    }
+//    @Test
+//    public void schemaCreation() {
+//        mainService.schemaCreation();
+//    }
 
     @Test
     public void convertSQLtoNEO4JTest() throws SQLException, SchemaCrawlerException, IOException {

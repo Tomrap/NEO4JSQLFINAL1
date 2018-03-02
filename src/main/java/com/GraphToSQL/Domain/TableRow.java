@@ -12,6 +12,15 @@ public class TableRow {
 
     private MyNode myNode;
     private Map<String, Integer> foreignKeys = new HashMap<>();
+    private Map<String, Object> relationshipProperties = new HashMap<>();
+
+    public Map<String, Object> getRelationshipProperties() {
+        return relationshipProperties;
+    }
+
+    public void setRelationshipProperties(Map<String, Object> relationshipProperties) {
+        this.relationshipProperties = relationshipProperties;
+    }
 
     public MyNode getMyNode() {
         return myNode;

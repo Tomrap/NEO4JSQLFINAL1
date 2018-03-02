@@ -12,7 +12,7 @@ import java.util.*;
  * Created by John on 2018-02-18.
  */
 @Service
-public class GraphToSQLConverter {
+public class GraphToSQLRowConverter {
 
     private String join = "_";
 
@@ -43,70 +43,76 @@ public class GraphToSQLConverter {
         MyRelationshipType key = element.getKey();
         for (MyRelationship myRelationship : element.getValue()) {
 
-            //TODO handle relationship properties later
             MyNode firstNode = allMyNodes.get(key.getFirstNodeLabel()).get(myRelationship.getFirstNode());
             MyNode secondNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getSecondNode());
 
             if (key.isFirstNodeForeignKey() && key.isSecondNodeForeignKey()) {
-                createRowWithTwoForeignKeys(allRows, key, firstNode, secondNode);
+                createRowWithTwoForeignKeys(allRows, key, firstNode, secondNode,myRelationship);
             } else if (key.isFirstNodeForeignKey()) {
-                createRowWithOneForeignKey(allRows,key.getSecondNodeLabel(),key.getFirstNodeLabel(),secondNode,firstNode);
+                createRowWithOneForeignKey(allRows,key.getSecondNodeLabel(),key.getFirstNodeLabel(),secondNode,firstNode,myRelationship);
             } else {
-                createRowWithOneForeignKey(allRows,key.getFirstNodeLabel(),key.getSecondNodeLabel(),firstNode,secondNode);
+                createRowWithOneForeignKey(allRows,key.getFirstNodeLabel(),key.getSecondNodeLabel(),firstNode,secondNode,myRelationship);
             }
         }
     }
 
-    private void createRowWithTwoForeignKeys(Map<String, Map<Integer, TableRow>> allRows, MyRelationshipType key, MyNode firstNode, MyNode secondNode) {
-        //TODO do sth about the names
+    private void createRowWithTwoForeignKeys(Map<String, Map<Integer, TableRow>> allRows, MyRelationshipType key, MyNode firstNode, MyNode secondNode, MyRelationship myRelationship) {
+
         TableRow tableRow;
         if (allRows.get(key.getFirstNodeLabel() + join + key.getSecondNodeLabel()) != null) {
             tableRow = allRows.get(key.getFirstNodeLabel() + join + key.getSecondNodeLabel()).get(firstNode.getSqlID() + secondNode.getSqlID());
             if (tableRow == null) {
-                tableRow = assignForeignKeysInJunctionTable(key, firstNode, secondNode);
+                tableRow = assignForeignKeysInJunctionTable(key, firstNode, secondNode,myRelationship);
             } else {
                 Map<String, Integer> foreignKeys = tableRow.getForeignKeys();
                 foreignKeys.put(key.getFirstNodeLabel(), firstNode.getSqlID());
                 foreignKeys.put(key.getSecondNodeLabel(), secondNode.getSqlID());
+                Map<String, Object> relationshipProperties = tableRow.getRelationshipProperties();
+                relationshipProperties.putAll(myRelationship.getValues());
+                tableRow.setRelationshipProperties(relationshipProperties);
             }
         } else {
-            tableRow = assignForeignKeysInJunctionTable(key, firstNode, secondNode);
+            tableRow = assignForeignKeysInJunctionTable(key, firstNode, secondNode,myRelationship);
         }
-        //TODO introduce composite primary key
         allRows.computeIfAbsent(key.getFirstNodeLabel() + join + key.getSecondNodeLabel(), k -> new HashMap<>()).put(firstNode.getSqlID() + secondNode.getSqlID(), tableRow);
     }
 
-    private TableRow assignForeignKeysInJunctionTable(MyRelationshipType key, MyNode firstNode, MyNode secondNode) {
+    private TableRow assignForeignKeysInJunctionTable(MyRelationshipType key, MyNode firstNode, MyNode secondNode, MyRelationship myRelationship) {
         TableRow tableRow;
         tableRow = new TableRow();
         Map<String, Integer> foreignKeys = new HashMap<>();
         foreignKeys.put(key.getFirstNodeLabel(), firstNode.getSqlID());
         foreignKeys.put(key.getSecondNodeLabel(), secondNode.getSqlID());
         tableRow.setForeignKeys(foreignKeys);
+        tableRow.setRelationshipProperties(myRelationship.getValues());
         return tableRow;
     }
 
-    private void createRowWithOneForeignKey(Map<String, Map<Integer, TableRow>> allRows, String firstNodeLabel, String secondNodeLabel, MyNode firstNode, MyNode secondNode  ) {
+    private void createRowWithOneForeignKey(Map<String, Map<Integer, TableRow>> allRows, String firstNodeLabel, String secondNodeLabel, MyNode firstNode, MyNode secondNode, MyRelationship myRelationship) {
         TableRow tableRow;
         if (allRows.get(firstNodeLabel) != null) {
             tableRow = allRows.get(firstNodeLabel).get(firstNode.getSqlID());
             if (tableRow == null) {
-                tableRow = createRowWithGivenForeignKey(firstNode,secondNode,secondNodeLabel);
+                tableRow = createRowWithGivenForeignKey(firstNode,secondNode,secondNodeLabel,myRelationship);
             } else {
                 tableRow.getForeignKeys().put(secondNodeLabel, secondNode.getSqlID());
+                Map<String, Object> relationshipProperties = tableRow.getRelationshipProperties();
+                relationshipProperties.putAll(myRelationship.getValues());
+                tableRow.setRelationshipProperties(relationshipProperties);
             }
         } else {
-            tableRow = createRowWithGivenForeignKey(firstNode,secondNode,secondNodeLabel);
+            tableRow = createRowWithGivenForeignKey(firstNode,secondNode,secondNodeLabel,myRelationship);
         }
         allRows.computeIfAbsent(firstNodeLabel, k -> new HashMap<>()).put(firstNode.getSqlID(), tableRow);
     }
 
-    private TableRow createRowWithGivenForeignKey(MyNode firstNode, MyNode secondNode, String foreignKeyName) {
+    private TableRow createRowWithGivenForeignKey(MyNode firstNode, MyNode secondNode, String foreignKeyName, MyRelationship myRelationship) {
         TableRow tableRow = new TableRow();
         tableRow.setMyNode(firstNode);
         Map<String, Integer> foreignKeys = new HashMap<>();
         foreignKeys.put(foreignKeyName, secondNode.getSqlID());
         tableRow.setForeignKeys(foreignKeys);
+        tableRow.setRelationshipProperties(myRelationship.getValues());
         return tableRow;
     }
 

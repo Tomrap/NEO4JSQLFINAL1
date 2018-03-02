@@ -23,7 +23,7 @@ import static org.jooq.impl.DSL.*;
  * Created by John on 2018-02-23.
  */
 @Service
-public class SQLConverter{
+public class SQLRowToSQLConverter {
 
     private String id = "_ID";
 
@@ -80,6 +80,11 @@ public class SQLConverter{
 
                     columnNames.add(field(myNodeValue.getKey()));
                     rowValues.add(myNodeValue.getValue());
+                }
+
+                for(Map.Entry<String, Object> relationshipProperty: row.getValue().getRelationshipProperties().entrySet()) {
+                    columnNames.add(field(relationshipProperty.getKey()));
+                    rowValues.add(relationshipProperty.getValue());
                 }
 
                 for(Map.Entry<String, Integer> foreignKey : row.getValue().getForeignKeys().entrySet()) {

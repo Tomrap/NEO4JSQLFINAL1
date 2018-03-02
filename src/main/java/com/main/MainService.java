@@ -4,8 +4,8 @@ import com.GraphToSQL.Domain.GraphDetail;
 import com.GraphToSQL.Domain.GraphToSQLTableDetail;
 import com.SQLToGraph.Domain.SQLtoGraphTableDetail;
 import com.GraphToSQL.Domain.TableRow;
-import com.GraphToSQL.Service.GraphToSQLConverter;
-import com.GraphToSQL.Service.SQLConverter;
+import com.GraphToSQL.Service.GraphToSQLRowConverter;
+import com.GraphToSQL.Service.SQLRowToSQLConverter;
 import com.GraphToSQL.Service.SQLSchemaCreator;
 import com.SQLToGraph.Service.GraphGenerator;
 import com.SQLToGraph.Service.SQLService;
@@ -34,7 +34,7 @@ public class MainService {
     private SQLService sqlService;
 
     @Autowired
-    private GraphToSQLConverter graphToSQLConverter;
+    private GraphToSQLRowConverter graphToSQLRowConverter;
 
     @Autowired
     private com.SQLToGraph.Service.SQLSchemaReader SQLSchemaReader;
@@ -43,7 +43,7 @@ public class MainService {
     private SQLSchemaCreator sqlSchemaCreator;
 
     @Autowired
-    private SQLConverter sqlConverter;
+    private SQLRowToSQLConverter SQLRowToSqlConverter;
 
     public void convertSQLtoNEO4J() throws SQLException, SchemaCrawlerException, IOException {
 
@@ -54,12 +54,12 @@ public class MainService {
 
     public void convertNEO4JtoSQL() throws SQLException, IOException {
 
-        GraphDetail graphDetail = graphToSQLConverter.read();
+        GraphDetail graphDetail = graphToSQLRowConverter.read();
         List<GraphToSQLTableDetail> schema = sqlSchemaCreator.createSchema(graphDetail);
-        sqlConverter.createSQLTables(schema);
-        Map<String, Map<Integer, TableRow>> allRows = graphToSQLConverter.convertGraphDetailsToTableRows(graphDetail, schema);
-        sqlConverter.createAndInsertSQLRows(allRows);
-        sqlConverter.createForeignKeysConstraints(schema);
+        SQLRowToSqlConverter.createSQLTables(schema);
+        Map<String, Map<Integer, TableRow>> allRows = graphToSQLRowConverter.convertGraphDetailsToTableRows(graphDetail, schema);
+        SQLRowToSqlConverter.createAndInsertSQLRows(allRows);
+        SQLRowToSqlConverter.createForeignKeysConstraints(schema);
 
     }
 
