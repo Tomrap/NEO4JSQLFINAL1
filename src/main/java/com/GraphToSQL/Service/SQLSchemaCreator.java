@@ -14,7 +14,7 @@ public class SQLSchemaCreator {
     public List<GraphToSQLTableDetail> createSchema(GraphDetail graphDetail) {
 
         List<GraphToSQLTableDetail> graphToSQLTableDetails = new ArrayList<>();
-        Map<String, List<String>> foreignKeys = new HashMap<>();
+        Map<String, List<Map.Entry<String,String>>> foreignKeys = new HashMap<>();
         Map<String,Map<String, Object>> allRelationshipsProperties = new HashMap<>();
 
         for(Map.Entry<MyRelationshipType, List<MyRelationship>> relationshipGroup: graphDetail.getAllMyRelationships().entrySet()) {
@@ -27,14 +27,14 @@ public class SQLSchemaCreator {
             createTableDetail(graphToSQLTableDetails, foreignKeys, nodeGroup,allRelationshipsProperties);
         }
 
-        for (Map.Entry<String, List<String>> element : foreignKeys.entrySet()) {
+        for (Map.Entry<String, List<Map.Entry<String, String>>> element : foreignKeys.entrySet()) {
 
             handleJunctionTable(graphToSQLTableDetails, foreignKeys, element,allRelationshipsProperties);
         }
         return graphToSQLTableDetails;
     }
 
-    private void handleJunctionTable(List<GraphToSQLTableDetail> graphToSQLTableDetails, Map<String, List<String>> foreignKeys, Map.Entry<String, List<String>> element, Map<String, Map<String, Object>> allRelationshipsProperties) {
+    private void handleJunctionTable(List<GraphToSQLTableDetail> graphToSQLTableDetails, Map<String, List<Map.Entry<String, String>>> foreignKeys, Map.Entry<String, List<Map.Entry<String, String>>> element, Map<String, Map<String, Object>> allRelationshipsProperties) {
         GraphToSQLTableDetail graphToSQLTableDetail = new GraphToSQLTableDetail();
         graphToSQLTableDetail.setTableName(element.getKey());
         List<String> pks = new ArrayList<>();
@@ -47,7 +47,7 @@ public class SQLSchemaCreator {
             columnAndType.putAll(remove1);
         }
         graphToSQLTableDetail.setColumnsAndTypes(columnAndType);
-        List<String> remove = foreignKeys.remove(element.getKey());
+        List<Map.Entry<String, String>> remove = foreignKeys.remove(element.getKey());
         if(remove == null) {
             graphToSQLTableDetail.setGraphFks(new ArrayList<>());
         } else {
@@ -56,7 +56,7 @@ public class SQLSchemaCreator {
         graphToSQLTableDetails.add(graphToSQLTableDetail);
     }
 
-    private void createTableDetail(List<GraphToSQLTableDetail> graphToSQLTableDetails, Map<String, List<String>> foreignKeys, Map.Entry<String, Map<Long, MyNode>> nodeGroup, Map<String, Map<String, Object>> allRelationshipsProperties) {
+    private void createTableDetail(List<GraphToSQLTableDetail> graphToSQLTableDetails, Map<String, List<Map.Entry<String, String>>> foreignKeys, Map.Entry<String, Map<Long, MyNode>> nodeGroup, Map<String, Map<String, Object>> allRelationshipsProperties) {
         // in NEO4J nodes with the same label can have different properties, i need to collect all to create all the columns
         // important assumption - all properties with the same name within the same node group have the same type - it is not enforced by NEO4J
         GraphToSQLTableDetail graphToSQLTableDetail = new GraphToSQLTableDetail();
@@ -76,7 +76,7 @@ public class SQLSchemaCreator {
         pks.add(nodeGroup.getKey());
         graphToSQLTableDetail.setPk(pks);
         graphToSQLTableDetail.setColumnsAndTypes(columnAndType);
-        List<String> remove = foreignKeys.remove(nodeGroup.getKey());
+        List<Map.Entry<String, String>> remove = foreignKeys.remove(nodeGroup.getKey());
         if(remove == null) {
             graphToSQLTableDetail.setGraphFks(new ArrayList<>());
         } else {
@@ -86,7 +86,7 @@ public class SQLSchemaCreator {
         graphToSQLTableDetails.add(graphToSQLTableDetail);
     }
 
-    private void decideWhichTableShouldHaveForeignKey(Map<String, List<String>> foreignKeys, Map.Entry<MyRelationshipType, List<MyRelationship>> relationshipGroup, Map<String, Map<String, Object>> allRelationshipsProperties) {
+    private void decideWhichTableShouldHaveForeignKey(Map<String, List<Map.Entry<String, String>>> foreignKeys, Map.Entry<MyRelationshipType, List<MyRelationship>> relationshipGroup, Map<String, Map<String, Object>> allRelationshipsProperties) {
 
         MyRelationshipType key = relationshipGroup.getKey();
         Set<Long> firstNodesIds = new HashSet<>();
@@ -101,9 +101,9 @@ public class SQLSchemaCreator {
         }
 
         if(firstNodesIds.size()<value.size() && secondNodesIds.size()<value.size()) {
-            List<String> bothForeignKeys = new ArrayList<>();
-            bothForeignKeys.add(key.getFirstNodeLabel());
-            bothForeignKeys.add(key.getSecondNodeLabel());
+            List<Map.Entry<String,String>> bothForeignKeys = new ArrayList<>();
+            bothForeignKeys.add(new AbstractMap.SimpleEntry<>(key.getFirstNodeLabel(),key.getLabel()+"_1"));
+            bothForeignKeys.add(new AbstractMap.SimpleEntry<>(key.getSecondNodeLabel(),key.getLabel()+"_2"));
             foreignKeys.computeIfAbsent(key.getFirstNodeLabel() +"_"+ key.getSecondNodeLabel(),
                     k -> new ArrayList<>()).addAll(bothForeignKeys);
             allRelationshipsProperties.computeIfAbsent(key.getFirstNodeLabel() +"_"+ key.getSecondNodeLabel(),
@@ -112,12 +112,12 @@ public class SQLSchemaCreator {
             key.setSecondNodeForeignKey(true);
         }
         else if(firstNodesIds.size()<value.size()) {
-            foreignKeys.computeIfAbsent(key.getSecondNodeLabel(), k -> new ArrayList<>()).add(key.getFirstNodeLabel());
+            foreignKeys.computeIfAbsent(key.getSecondNodeLabel(), k -> new ArrayList<>()).add(new AbstractMap.SimpleEntry<>(key.getFirstNodeLabel(),key.getLabel()));
             allRelationshipsProperties.computeIfAbsent(key.getSecondNodeLabel(), k -> new HashMap<>()).putAll(relationshipProperties);
             key.setFirstNodeForeignKey(true);
         }
         else {
-            foreignKeys.computeIfAbsent(key.getFirstNodeLabel(), k -> new ArrayList<>()).add(key.getSecondNodeLabel());
+            foreignKeys.computeIfAbsent(key.getFirstNodeLabel(), k -> new ArrayList<>()).add(new AbstractMap.SimpleEntry<>(key.getSecondNodeLabel(),key.getLabel()));
             allRelationshipsProperties.computeIfAbsent(key.getFirstNodeLabel(), k -> new HashMap<>()).putAll(relationshipProperties);
             key.setSecondNodeForeignKey(true);
         }

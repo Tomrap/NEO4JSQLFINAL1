@@ -54,10 +54,12 @@ public class GraphReaderDao {
             String firstNodeLabel = StreamSupport.stream(startNode.getLabels().spliterator(), false).map(Object::toString).collect(Collectors.joining(""));
             String secondNodeLabel = StreamSupport.stream(endNode.getLabels().spliterator(), false).map(Object::toString).collect(Collectors.joining(""));
 
+            String label = relationship.getType().name();
+
             MyRelationship myRelationship = new MyRelationship(startNode.getId(),
                     endNode.getId(),relationship.getAllProperties());
 
-            allMyRelationships.computeIfAbsent(new MyRelationshipType(firstNodeLabel,secondNodeLabel), k-> new ArrayList<>()).add(myRelationship);
+            allMyRelationships.computeIfAbsent(new MyRelationshipType(label,firstNodeLabel,secondNodeLabel), k-> new ArrayList<>()).add(myRelationship);
         }
 
         return allMyRelationships;

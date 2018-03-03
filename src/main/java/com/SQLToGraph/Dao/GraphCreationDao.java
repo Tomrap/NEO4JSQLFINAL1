@@ -124,7 +124,7 @@ public class GraphCreationDao {
                 hasherForeign = hasherForeign.putInt(value);
             }
             int foreignNodeIndex = foreignSQLtoGraphTableDetail.getFirstIndex() + foreignSQLtoGraphTableDetail.getMappingMap().get(hasherForeign.hash().asInt());
-            batchInserter.createRelationship(primaryNodeIndex,foreignNodeIndex, foreignTable.concat("::").concat(SQLtoGraphTableDetail.getTableName())::toUpperCase,null);
+            batchInserter.createRelationship(primaryNodeIndex,foreignNodeIndex, foreignTable.concat(SQLtoGraphTableDetail.getTableName())::toUpperCase,null);
         }
     }
 

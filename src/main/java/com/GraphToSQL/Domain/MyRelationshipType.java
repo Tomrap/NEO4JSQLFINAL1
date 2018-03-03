@@ -5,6 +5,7 @@ package com.GraphToSQL.Domain;
  */
 public class MyRelationshipType {
 
+    private String label;
     private String firstNodeLabel;
     private String secondNodeLabel;
     private boolean isFirstNodeForeignKey = false;
@@ -34,10 +35,14 @@ public class MyRelationshipType {
         return secondNodeLabel;
     }
 
+    public String getLabel() {
+        return label;
+    }
 
-    public MyRelationshipType(String firstNodeLabel, String secondNodeLabel) {
+    public MyRelationshipType(String label, String firstNodeLabel, String secondNodeLabel) {
         this.firstNodeLabel = firstNodeLabel;
         this.secondNodeLabel = secondNodeLabel;
+        this.label = label;
     }
 
     @Override
@@ -47,16 +52,12 @@ public class MyRelationshipType {
 
         MyRelationshipType that = (MyRelationshipType) o;
 
-        if (!firstNodeLabel.equals(that.firstNodeLabel)) return false;
-        return secondNodeLabel.equals(that.secondNodeLabel);
+        return label.equals(that.label);
 
     }
 
     @Override
     public int hashCode() {
-        int result = firstNodeLabel.hashCode();
-        result = 31 * result + secondNodeLabel.hashCode();
-        return result;
+        return label.hashCode();
     }
-
 }

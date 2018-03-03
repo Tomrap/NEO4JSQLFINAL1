@@ -62,20 +62,20 @@ public class SQLImportDaoTest {
     @Test
     public void testt() {
 
-        Map<MyRelationshipType,List<String>> allMyRelationships = new HashMap<>();
-        MyRelationshipType myRelationshipType1 = new MyRelationshipType("store","staff");
-        MyRelationshipType myRelationshipType2 = new MyRelationshipType("staff","store");
-
-        int hashcode1 = myRelationshipType1.hashCode();
-        int hashcode2 = myRelationshipType2.hashCode();
-
-        System.out.println(hashcode1);
-        System.out.println(hashcode2);
-
-        allMyRelationships.computeIfAbsent(myRelationshipType1, k-> new ArrayList<>()).add("Cos1");
-        allMyRelationships.computeIfAbsent(myRelationshipType2, k-> new ArrayList<>()).add("Cos2");
-
-        System.out.println("gdg");
+//        Map<MyRelationshipType,List<String>> allMyRelationships = new HashMap<>();
+////        MyRelationshipType myRelationshipType1 = new MyRelationshipType(label, "store","staff");
+////        MyRelationshipType myRelationshipType2 = new MyRelationshipType(label, "staff","store");
+//
+//        int hashcode1 = myRelationshipType1.hashCode();
+//        int hashcode2 = myRelationshipType2.hashCode();
+//
+//        System.out.println(hashcode1);
+//        System.out.println(hashcode2);
+//
+//        allMyRelationships.computeIfAbsent(myRelationshipType1, k-> new ArrayList<>()).add("Cos1");
+//        allMyRelationships.computeIfAbsent(myRelationshipType2, k-> new ArrayList<>()).add("Cos2");
+//
+//        System.out.println("gdg");
     }
 
 

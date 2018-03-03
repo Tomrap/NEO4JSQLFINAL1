@@ -12,13 +12,13 @@ public class GraphToSQLTableDetail{
 
     private String tableName;
     private List<String> pk;
-    private List<String> graphFks;
+    private List<Map.Entry<String,String>> graphFks;
     private Map<String, Object> columnsAndTypes;
 
-    public List<String> getGraphFks() {
+    public List<Map.Entry<String,String>> getGraphFks() {
         return graphFks;
     }
-    public void setGraphFks(List<String> graphFks) {
+    public void setGraphFks(List<Map.Entry<String,String>> graphFks) {
         this.graphFks = graphFks;
     }
 

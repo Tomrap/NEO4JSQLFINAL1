@@ -39,7 +39,7 @@ public class SQLRowToSQLConverter {
             return SQLDataType.INTEGER;
         }
         if(value instanceof String) {
-            return SQLDataType.VARCHAR.length(130);
+            return SQLDataType.VARCHAR.length(200);
         }
         if(value instanceof Float || value instanceof Double) {
             return SQLDataType.DECIMAL(10,5);
@@ -88,7 +88,7 @@ public class SQLRowToSQLConverter {
                 }
 
                 for(Map.Entry<String, Integer> foreignKey : row.getValue().getForeignKeys().entrySet()) {
-                    columnNames.add(field(foreignKey.getKey()+id));
+                    columnNames.add(field(foreignKey.getKey()));
                     rowValues.add(foreignKey.getValue());
                 }
 
@@ -118,8 +118,8 @@ public class SQLRowToSQLConverter {
                 table.column(element.getKey(), inferType(element.getValue()));
             }
 
-            for(String element: graphToSQLTableDetail.getGraphFks()) {
-                table.column(element+id,  SQLDataType.INTEGER).getSQL();
+            for(Map.Entry<String, String> element: graphToSQLTableDetail.getGraphFks()) {
+                table.column(element.getValue(),  SQLDataType.INTEGER).getSQL();
             }
 
             for (String element : graphToSQLTableDetail.getPk()) {
@@ -138,9 +138,9 @@ public class SQLRowToSQLConverter {
 
         for (GraphToSQLTableDetail graphToSQLTableDetail : graphToSQLTableDetails) {
 
-            for (String element : graphToSQLTableDetail.getGraphFks()) {
-                create.alterTable(graphToSQLTableDetail.getTableName()).add(constraint(graphToSQLTableDetail.getTableName() + "_" + element).foreignKey(element + id)
-                        .references(element, element + id)).execute();
+            for (Map.Entry<String, String> element : graphToSQLTableDetail.getGraphFks()) {
+                create.alterTable(graphToSQLTableDetail.getTableName()).add(constraint(graphToSQLTableDetail.getTableName() + "_" + element.getValue()).foreignKey(element.getValue())
+                        .references(element.getKey(), element.getKey() + id)).execute();
             }
         }
     }
