@@ -28,8 +28,6 @@ import static org.jooq.impl.DSL.*;
 @Service
 public class SQLRowToSQLConverter {
 
-    private String id = "_ID";
-
     @Autowired
     private SQLImportDao SQLImportDao;
 
@@ -68,6 +66,14 @@ public class SQLRowToSQLConverter {
         return value;
     }
 
+    private String escape(String value) {
+        return "`" + value + "`";
+    }
+
+    private String addID(String value) {
+        return value + "_ID";
+    }
+
     public void createAndInsertSQLRows(Map<String, Map<Integer, TableRow>> allRows) throws SQLException, IOException {
 
         Connection connection = SQLImportDao.getJdbcTemplate().getDataSource().getConnection();
@@ -90,7 +96,7 @@ public class SQLRowToSQLConverter {
                 rowValues = new ArrayList<>();
                 columnNames = new ArrayList<>();
 
-                columnNames.add(field(element.getKey()+id));
+                columnNames.add(field(escape(addID(element.getKey()))));
                 MyNode myNode = row.getValue().getMyNode();
 
                 if(myNode == null) {
@@ -98,21 +104,21 @@ public class SQLRowToSQLConverter {
                 } else {
                     rowValues.add(myNode.getSqlID());
                     for(Map.Entry<String, Object> myNodeValue: myNode.getValues().entrySet()) {
-                        columnNames.add(field(myNodeValue.getKey()));
+                        columnNames.add(field(escape(myNodeValue.getKey())));
                         rowValues.add(convertValue(myNodeValue.getValue()));
                     }
                 }
                 for(Map.Entry<String, Object> relationshipProperty: row.getValue().getRelationshipProperties().entrySet()) {
-                    columnNames.add(field(relationshipProperty.getKey()));
+                    columnNames.add(field(escape(relationshipProperty.getKey())));
                     rowValues.add(convertValue(relationshipProperty.getValue()));
                 }
 
                 for(Map.Entry<String, Integer> foreignKey : row.getValue().getForeignKeys().entrySet()) {
-                    columnNames.add(field(foreignKey.getKey()));
+                    columnNames.add(field(escape(foreignKey.getKey())));
                     rowValues.add(foreignKey.getValue());
                 }
 
-                inserts.add(create.insertInto(table(element.getKey()), columnNames).values(rowValues));
+                inserts.add(create.insertInto(table(escape(element.getKey())), columnNames).values(rowValues));
             }
             create.batch(inserts).execute();
         }
@@ -131,7 +137,7 @@ public class SQLRowToSQLConverter {
             CreateTableAsStep<Record> table = create.createTable(graphToSQLTableDetail.getTableName());
 
             for (String element : graphToSQLTableDetail.getPk()) {
-                table.column(element+id, SQLDataType.INTEGER.nullable(false));
+                table.column(addID(element), SQLDataType.INTEGER.nullable(false));
             }
 
             for (Map.Entry<String, Object> element : graphToSQLTableDetail.getColumnsAndTypes().entrySet()) {
@@ -143,7 +149,7 @@ public class SQLRowToSQLConverter {
             }
 
             for (String element : graphToSQLTableDetail.getPk()) {
-                ((CreateTableColumnStep) table).constraints(constraint(element+id).primaryKey(element+id));
+                ((CreateTableColumnStep) table).constraints(constraint(addID(element)).primaryKey(addID(element)));
             }
 
             ((CreateTableColumnStep) table).execute();
@@ -160,7 +166,7 @@ public class SQLRowToSQLConverter {
 
             for (Map.Entry<String, String> element : graphToSQLTableDetail.getGraphFks()) {
                 create.alterTable(graphToSQLTableDetail.getTableName()).add(constraint(graphToSQLTableDetail.getTableName() + "_" + element.getValue()).foreignKey(element.getValue())
-                        .references(element.getKey(), element.getKey() + id)).execute();
+                        .references(element.getKey(), addID(element.getKey()))).execute();
             }
         }
     }

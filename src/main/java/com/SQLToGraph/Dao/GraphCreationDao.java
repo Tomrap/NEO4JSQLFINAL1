@@ -4,15 +4,16 @@ import com.SQLToGraph.Domain.SQLtoGraphTableDetail;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
-import org.apache.commons.compress.utils.IOUtils;
 import org.apache.log4j.Logger;
-import org.neo4j.cypher.internal.frontend.v2_3.ast.In;
+import org.neo4j.graphdb.Label;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -48,9 +49,6 @@ public class GraphCreationDao {
             ois.close();
             return object;
 
-//            ByteArrayOutputStream bo = new ByteArrayOutputStream();
-//            IOUtils.copy(((Blob) value).getBinaryStream(), bo);
-//            return bo.toByteArray();
         }
         return value;
     }
@@ -166,7 +164,8 @@ public class GraphCreationDao {
                 hasherForeign = hasherForeign.putInt(value);
             }
             int foreignNodeIndex = foreignSQLtoGraphTableDetail.getFirstIndex() + foreignSQLtoGraphTableDetail.getMappingMap().get(hasherForeign.hash().asInt());
-            batchInserter.createRelationship(primaryNodeIndex,foreignNodeIndex, foreignTable.concat(entry.getKey().stream().map(x -> x).collect(Collectors.joining()))::toUpperCase,null);
+            batchInserter.createRelationship(primaryNodeIndex,foreignNodeIndex,
+                    SQLtoGraphTableDetail.getTableName().concat("::").concat(foreignTable.concat(entry.getKey().stream().map(x -> x).collect(Collectors.joining())))::toUpperCase,null);
         }
     }
 

@@ -21,6 +21,8 @@ import java.util.stream.StreamSupport;
 @Repository
 public class GraphReaderDao {
 
+    private String delimiter = "_";
+
     @Autowired
     private GraphDatabaseService graphDatabaseService;
 
@@ -33,7 +35,8 @@ public class GraphReaderDao {
             //TODO make sure that labels are always in the same order - yes do this
             Iterable<Label> labels = node.getLabels();
 
-            String oneLabel = StreamSupport.stream(labels.spliterator(), false).map(Object::toString).collect(Collectors.joining(""));
+
+            String oneLabel = StreamSupport.stream(labels.spliterator(), false).map(Object::toString).collect(Collectors.joining(delimiter));
 
             MyNode myNode = new MyNode(node.getAllProperties());
 
@@ -51,8 +54,8 @@ public class GraphReaderDao {
             Node startNode = relationship.getStartNode();
             Node endNode = relationship.getEndNode();
 
-            String firstNodeLabel = StreamSupport.stream(startNode.getLabels().spliterator(), false).map(Object::toString).collect(Collectors.joining(""));
-            String secondNodeLabel = StreamSupport.stream(endNode.getLabels().spliterator(), false).map(Object::toString).collect(Collectors.joining(""));
+            String firstNodeLabel = StreamSupport.stream(startNode.getLabels().spliterator(), false).map(Object::toString).collect(Collectors.joining(delimiter));
+            String secondNodeLabel = StreamSupport.stream(endNode.getLabels().spliterator(), false).map(Object::toString).collect(Collectors.joining(delimiter));
 
             String label = relationship.getType().name();
 

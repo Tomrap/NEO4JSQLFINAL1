@@ -2,14 +2,11 @@ package com.GraphToSQL.Service;
 
 import com.GraphToSQL.Dao.GraphReaderDao;
 import com.GraphToSQL.Domain.*;
-import javafx.scene.control.Tab;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Created by John on 2018-02-18.
@@ -55,13 +52,13 @@ public class GraphToSQLRowConverter {
             for (MyRelationship myRelationship : element.getValue()) {
                 MyNode firstNode = allMyNodes.get(key.getFirstNodeLabel()).get(myRelationship.getFirstNode());
                 MyNode secondNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getSecondNode());
-                createRowWithOneForeignKey(allRows,key.getSecondNodeLabel(),key.getFirstNodeLabel(),secondNode,firstNode,myRelationship,key);
+                createRowWithOneForeignKey(allRows,key.getSecondNodeLabel(), secondNode,firstNode,myRelationship,key);
             }
         } else {
             for (MyRelationship myRelationship : element.getValue()) {
                 MyNode firstNode = allMyNodes.get(key.getFirstNodeLabel()).get(myRelationship.getFirstNode());
                 MyNode secondNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getSecondNode());
-                createRowWithOneForeignKey(allRows,key.getFirstNodeLabel(),key.getSecondNodeLabel(),firstNode,secondNode,myRelationship,key);
+                createRowWithOneForeignKey(allRows,key.getFirstNodeLabel(), firstNode,secondNode,myRelationship,key);
             }
         }
 
@@ -89,7 +86,7 @@ public class GraphToSQLRowConverter {
         return tableRow;
     }
 
-    private void createRowWithOneForeignKey(Map<String, Map<Integer, TableRow>> allRows, String firstNodeLabel, String secondNodeLabel, MyNode firstNode, MyNode secondNode, MyRelationship myRelationship, MyRelationshipType key) {
+    private void createRowWithOneForeignKey(Map<String, Map<Integer, TableRow>> allRows, String firstNodeLabel, MyNode firstNode, MyNode secondNode, MyRelationship myRelationship, MyRelationshipType key) {
         TableRow tableRow = allRows.get(firstNodeLabel).get(firstNode.getSqlID());
         tableRow.getForeignKeys().put(key.getLabel(), secondNode.getSqlID());
         Map<String, Object> relationshipProperties = tableRow.getRelationshipProperties();
