@@ -1,7 +1,5 @@
 package com.GraphToSQL.Domain;
 
-import com.GraphToSQL.Domain.MyNode;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +11,15 @@ public class TableRow {
     private MyNode myNode;
     private Map<String, Integer> foreignKeys = new HashMap<>();
     private Map<String, Object> relationshipProperties = new HashMap<>();
+    private int SQLID;
+
+    public void setSQLID(int SQLID) {
+        this.SQLID = SQLID;
+    }
+
+    public int getSQLID() {
+        return SQLID;
+    }
 
     public Map<String, Object> getRelationshipProperties() {
         return relationshipProperties;

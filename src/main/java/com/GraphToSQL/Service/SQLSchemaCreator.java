@@ -4,6 +4,7 @@ import com.GraphToSQL.Domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by John on 2018-02-19.
@@ -14,7 +15,7 @@ public class SQLSchemaCreator {
     public List<GraphToSQLTableDetail> createSchema(GraphDetail graphDetail) {
 
         List<GraphToSQLTableDetail> graphToSQLTableDetails = new ArrayList<>();
-        Map<String, List<Map.Entry<String,String>>> foreignKeys = new HashMap<>();
+        Map<String, List<Map.Entry<String,String>>> foreignKeys = new ConcurrentHashMap<>();
         Map<String,Map<String, Object>> allRelationshipsProperties = new HashMap<>();
 
         for(Map.Entry<MyRelationshipType, List<MyRelationship>> relationshipGroup: graphDetail.getAllMyRelationships().entrySet()) {
@@ -42,7 +43,6 @@ public class SQLSchemaCreator {
         graphToSQLTableDetail.setPk(pks);
         Map<String, Object> columnAndType = new HashMap<>();
         Map<String, Object> remove1 =allRelationshipsProperties.remove(element.getKey());
-        //TODO check if possible null pointer
         if(remove1 != null) {
             columnAndType.putAll(remove1);
         }
@@ -66,7 +66,6 @@ public class SQLSchemaCreator {
         }
 
         Map<String, Object> remove1 = allRelationshipsProperties.remove(nodeGroup.getKey());
-        //TODO check if possible null pointer
         if(remove1 != null) {
             columnAndType.putAll(remove1);
         }
@@ -102,11 +101,11 @@ public class SQLSchemaCreator {
 
         if(firstNodesIds.size()<value.size() && secondNodesIds.size()<value.size()) {
             List<Map.Entry<String,String>> bothForeignKeys = new ArrayList<>();
-            bothForeignKeys.add(new AbstractMap.SimpleEntry<>(key.getFirstNodeLabel(),key.getLabel()+"_1"));
-            bothForeignKeys.add(new AbstractMap.SimpleEntry<>(key.getSecondNodeLabel(),key.getLabel()+"_2"));
-            foreignKeys.computeIfAbsent(key.getFirstNodeLabel() +"_"+ key.getSecondNodeLabel(),
+            bothForeignKeys.add(new AbstractMap.SimpleEntry<>(key.getFirstNodeLabel(),key.getFirstNodeLabel()));
+            bothForeignKeys.add(new AbstractMap.SimpleEntry<>(key.getSecondNodeLabel(),key.getSecondNodeLabel()));
+            foreignKeys.computeIfAbsent(key.getLabel(),
                     k -> new ArrayList<>()).addAll(bothForeignKeys);
-            allRelationshipsProperties.computeIfAbsent(key.getFirstNodeLabel() +"_"+ key.getSecondNodeLabel(),
+            allRelationshipsProperties.computeIfAbsent(key.getLabel(),
                     k -> new HashMap<>()).putAll(relationshipProperties);
             key.setFirstNodeForeignKey(true);
             key.setSecondNodeForeignKey(true);

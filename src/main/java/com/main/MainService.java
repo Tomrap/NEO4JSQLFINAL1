@@ -57,7 +57,7 @@ public class MainService {
         GraphDetail graphDetail = graphToSQLRowConverter.read();
         List<GraphToSQLTableDetail> schema = sqlSchemaCreator.createSchema(graphDetail);
         SQLRowToSqlConverter.createSQLTables(schema);
-        Map<String, Map<Integer, TableRow>> allRows = graphToSQLRowConverter.convertGraphDetailsToTableRows(graphDetail, schema);
+        Map<String, Map<Integer, TableRow>> allRows = graphToSQLRowConverter.convertGraphDetailsToTableRows(graphDetail);
         SQLRowToSqlConverter.createAndInsertSQLRows(allRows);
         SQLRowToSqlConverter.createForeignKeysConstraints(schema);
 

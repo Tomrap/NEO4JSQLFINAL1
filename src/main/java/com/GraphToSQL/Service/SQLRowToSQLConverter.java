@@ -9,10 +9,12 @@ import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -49,6 +51,16 @@ public class SQLRowToSQLConverter {
         return SQLDataType.BLOB;
     }
 
+    private Object convertValue(Object value) {
+
+        //TODO convert to BLOB
+        if(value instanceof Object[]) {
+            return null;
+        }
+
+        return value;
+    }
+
     public void createAndInsertSQLRows(Map<String, Map<Integer, TableRow>> allRows) throws SQLException, IOException {
 
         Connection connection = SQLImportDao.getJdbcTemplate().getDataSource().getConnection();
@@ -71,20 +83,21 @@ public class SQLRowToSQLConverter {
                 rowValues = new ArrayList<>();
                 columnNames = new ArrayList<>();
 
+                columnNames.add(field(element.getKey()+id));
                 MyNode myNode = row.getValue().getMyNode();
 
-                columnNames.add(field(element.getKey()+id));
-                rowValues.add(myNode.getSqlID());
-
-                for(Map.Entry<String, Object> myNodeValue: myNode.getValues().entrySet()) {
-
-                    columnNames.add(field(myNodeValue.getKey()));
-                    rowValues.add(myNodeValue.getValue());
+                if(myNode == null) {
+                    rowValues.add(row.getValue().getSQLID());
+                } else {
+                    rowValues.add(myNode.getSqlID());
+                    for(Map.Entry<String, Object> myNodeValue: myNode.getValues().entrySet()) {
+                        columnNames.add(field(myNodeValue.getKey()));
+                        rowValues.add(convertValue(myNodeValue.getValue()));
+                    }
                 }
-
                 for(Map.Entry<String, Object> relationshipProperty: row.getValue().getRelationshipProperties().entrySet()) {
                     columnNames.add(field(relationshipProperty.getKey()));
-                    rowValues.add(relationshipProperty.getValue());
+                    rowValues.add(convertValue(relationshipProperty.getValue()));
                 }
 
                 for(Map.Entry<String, Integer> foreignKey : row.getValue().getForeignKeys().entrySet()) {
