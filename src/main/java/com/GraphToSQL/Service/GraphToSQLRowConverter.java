@@ -70,7 +70,7 @@ public class GraphToSQLRowConverter {
                 MyNode secondNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getSecondNode());
                 TableRow tableRow;
                 tableRow =  assignForeignKeysInJunctionTable(key, firstNode, secondNode,myRelationship);
-                allRows.computeIfAbsent(key.getLabel(), k -> new HashMap<>()).put(firstNode.getSqlID() + secondNode.getSqlID(), tableRow);
+                allRows.computeIfAbsent(key.getLabel(), k -> new HashMap<>()).put(tableRow.hashCode(), tableRow);
             }
         }
         else if (key.isFirstNodeForeignKey()) {
