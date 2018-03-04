@@ -45,7 +45,7 @@ public class MainService {
     @Autowired
     private SQLRowToSQLConverter SQLRowToSqlConverter;
 
-    public void convertSQLtoNEO4J() throws SQLException, SchemaCrawlerException, IOException {
+    public void convertSQLtoNEO4J() throws SQLException, SchemaCrawlerException, IOException, ClassNotFoundException {
 
         List<SQLtoGraphTableDetail> tables = SQLSchemaReader.extractSchema();
         List<List<Map<String, Object>>> allData = sqlService.readAllTables(tables);

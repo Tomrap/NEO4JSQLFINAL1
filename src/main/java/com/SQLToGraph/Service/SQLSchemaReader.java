@@ -39,17 +39,17 @@ public class SQLSchemaReader {
         for (final Table table : database.getTables()) {
 
             if(table.getTableType().equals(TableType.TABLE)) {
-                SQLtoGraphTableDetail SQLtoGraphTableDetail = new SQLtoGraphTableDetail();
+                SQLtoGraphTableDetail sQLtoGraphTableDetail = new SQLtoGraphTableDetail();
 
                 String tableName = table.getName();
-                SQLtoGraphTableDetail.setTableName(tableName);
-                SQLtoGraphTableDetail.setPk(getPrimaryKeys(table));
-                SQLtoGraphTableDetail.setFks(getForeignKeys(table));
-                SQLtoGraphTableDetail.setFields(getColumns(table, SQLtoGraphTableDetail));
+                sQLtoGraphTableDetail.setTableName(tableName);
+                sQLtoGraphTableDetail.setPk(getPrimaryKeys(table));
+                getForeignKeys(table,sQLtoGraphTableDetail);
+                sQLtoGraphTableDetail.setFields(getColumns(table, sQLtoGraphTableDetail));
 
-                tableList.add(SQLtoGraphTableDetail);
+                tableList.add(sQLtoGraphTableDetail);
 
-                SQLtoGraphTableDetail.addtoTables(SQLtoGraphTableDetail);
+                SQLtoGraphTableDetail.addtoTables(sQLtoGraphTableDetail);
             }
         }
         return tableList;
@@ -71,7 +71,8 @@ public class SQLSchemaReader {
         return new ArrayList<>(fields);
     }
 
-    private Map<List<String>, String> getForeignKeys(Table table) {
+    private void getForeignKeys(Table table, SQLtoGraphTableDetail sQLtoGraphTableDetail) {
+        boolean areThereAnyForeignKeysToThisTable = false;
         Collection<ForeignKey> foreignKeys = table.getForeignKeys();
         Map<List<String>, String> fks = new LinkedHashMap<>(10);
 
@@ -86,6 +87,9 @@ public class SQLSchemaReader {
                 List<String> keys = new ArrayList<>(3);
                 for (ForeignKeyColumnReference reference : columnReferences) {
                     Table otherTable = reference.getPrimaryKeyColumn().getParent();
+                    if(otherTable.equals(table)) {
+                        areThereAnyForeignKeysToThisTable = true;
+                    }
                     Table thisTable = reference.getForeignKeyColumn().getParent();
                     if (otherTable.equals(table) && !thisTable.equals(table)) continue;
                     keys.add(reference.getForeignKeyColumn().getName());
@@ -96,7 +100,8 @@ public class SQLSchemaReader {
                 //if (otherTable.equals(table) && thisTable.equals(table)) it means we have self referential foreign key
             }
         }
-        return fks;
+        sQLtoGraphTableDetail.setFks(fks);
+        sQLtoGraphTableDetail.setAreThereAnyForeignKeysToThisTable(areThereAnyForeignKeysToThisTable);
     }
 
     private List<String> getPrimaryKeys(Table table) {

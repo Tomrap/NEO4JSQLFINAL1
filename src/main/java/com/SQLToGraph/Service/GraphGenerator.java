@@ -24,7 +24,7 @@ public class GraphGenerator {
     @Autowired @Lazy
     private GraphCreationDao graphCreationDao;
 
-    public void generate(List<List<Map<String, Object>>> allData, List<SQLtoGraphTableDetail> SQLtoGraphTableDetailList) throws SQLException, IOException {
+    public void generate(List<List<Map<String, Object>>> allData, List<SQLtoGraphTableDetail> SQLtoGraphTableDetailList) throws SQLException, IOException, ClassNotFoundException {
 
         logger.info("Start generating graph database");
 
@@ -32,7 +32,7 @@ public class GraphGenerator {
         generateRelationships(SQLtoGraphTableDetailList,allData);
     }
 
-    private void generateNodes(List<SQLtoGraphTableDetail> SQLtoGraphTableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException {
+    private void generateNodes(List<SQLtoGraphTableDetail> SQLtoGraphTableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException, ClassNotFoundException {
 
         logger.info("Start generating nodes");
 
@@ -45,17 +45,18 @@ public class GraphGenerator {
 
             SQLtoGraphTableDetail SQLtoGraphTableDetail = it1.next();
             List<Map<String, Object>> row = it2.next();
+            if(!SQLtoGraphTableDetail.isJunctionTable()) {
+                SQLtoGraphTableDetail.setFirstIndex(firstIndex);
+                firstIndex += row.size();
+                graphCreationDao.createNodes(SQLtoGraphTableDetail, row);
+            }
 
-            SQLtoGraphTableDetail.setFirstIndex(firstIndex);
-            firstIndex += row.size();
-
-            graphCreationDao.createNodes(SQLtoGraphTableDetail, row);
         }
 
         logger.info("Finished generating nodes");
     }
 
-    private void generateRelationships(List<SQLtoGraphTableDetail> SQLtoGraphTableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException {
+    private void generateRelationships(List<SQLtoGraphTableDetail> SQLtoGraphTableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException, ClassNotFoundException {
 
         logger.info("Start generating relationships for database");
 

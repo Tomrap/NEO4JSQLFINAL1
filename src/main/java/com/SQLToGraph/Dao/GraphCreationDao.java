@@ -6,20 +6,18 @@ import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.log4j.Logger;
+import org.neo4j.cypher.internal.frontend.v2_3.ast.In;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Lazy
 @Repository
@@ -33,20 +31,31 @@ public class GraphCreationDao {
     private static final Logger logger = Logger.getLogger(GraphCreationDao.class);
 
 
-    public Object convertValue(Object value) throws SQLException, IOException {
+    public Object convertValue(Object value) throws SQLException, IOException, ClassNotFoundException {
         if (value instanceof Date) {
             return ((Date) value).getTime();
         }
         if (value instanceof BigDecimal) return ((BigDecimal) value).doubleValue();
         if (value instanceof Blob) {
-            ByteArrayOutputStream bo = new ByteArrayOutputStream();
-            IOUtils.copy(((Blob) value).getBinaryStream(), bo);
-            return bo.toByteArray();
+
+            //TODO convert to BLOB
+            int blobLength = (int) ((Blob) value).length();
+            byte[] blobAsBytes = ((Blob) value).getBytes(1, blobLength);
+            ((Blob) value).free();
+            ByteArrayInputStream bis = new ByteArrayInputStream(blobAsBytes);
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            Object object = ois.readObject();
+            ois.close();
+            return object;
+
+//            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+//            IOUtils.copy(((Blob) value).getBinaryStream(), bo);
+//            return bo.toByteArray();
         }
         return value;
     }
 
-    public void createNodes(final SQLtoGraphTableDetail SQLtoGraphTableDetail, List<Map<String, Object>> rs) throws SQLException, IOException {
+    public void createNodes(final SQLtoGraphTableDetail SQLtoGraphTableDetail, List<Map<String, Object>> rs) throws SQLException, IOException, ClassNotFoundException {
 
         logger.info("Start generating nodes for " + SQLtoGraphTableDetail.getTableName());
 
@@ -67,7 +76,7 @@ public class GraphCreationDao {
         logger.info("Finished generating nodes for " + SQLtoGraphTableDetail.getTableName());
     }
 
-    private void handleOneRowForNode(SQLtoGraphTableDetail SQLtoGraphTableDetail, HashMap<Integer, Integer> mappingMap, List<String> fields, int currentIndex, Map row) throws SQLException, IOException {
+    private void handleOneRowForNode(SQLtoGraphTableDetail SQLtoGraphTableDetail, HashMap<Integer, Integer> mappingMap, List<String> fields, int currentIndex, Map row) throws SQLException, IOException, ClassNotFoundException {
 
         Map<String, Object> map = new HashMap<>();
         for (String field : fields) {
@@ -88,21 +97,54 @@ public class GraphCreationDao {
     }
 
 
-    public void createRelationships(SQLtoGraphTableDetail SQLtoGraphTableDetail, List<Map<String, Object>> rs) throws IOException, SQLException {
+    public void createRelationships(SQLtoGraphTableDetail SQLtoGraphTableDetail, List<Map<String, Object>> rs) throws IOException, SQLException, ClassNotFoundException {
 
         logger.info("Start generating relationships for " + SQLtoGraphTableDetail.getTableName());
 
+        if(SQLtoGraphTableDetail.isJunctionTable()) {
+            for (Map<String, Object> row : rs) {
+                List<String> fields = SQLtoGraphTableDetail.getFields();
+                handleOneRowForRelationshipInJunctionTable(SQLtoGraphTableDetail, row, fields);
+            }
+        } else {
             int currentValue = 0;
-
             if (SQLtoGraphTableDetail.getFks().size() > 0) {
 
                 for (Map<String, Object> row : rs) {
-
                     handleOneRowForRelationship(SQLtoGraphTableDetail, currentValue, row);
                     currentValue++;
                 }
             }
+        }
         logger.info("Finished generating relationships for " + SQLtoGraphTableDetail.getTableName());
+    }
+
+    private void handleOneRowForRelationshipInJunctionTable(SQLtoGraphTableDetail SQLtoGraphTableDetail, Map<String, Object> row, List<String> fields) throws IOException, SQLException, ClassNotFoundException {
+
+        int[] indexes = new int[2];
+        int count = 0;
+
+        for (Map.Entry<List<String>, String> entry : SQLtoGraphTableDetail.getFks().entrySet()) {
+
+            final String foreignTable = entry.getValue();
+            SQLtoGraphTableDetail foreignSQLtoGraphTableDetail = SQLtoGraphTableDetail.getTable(foreignTable);
+            Hasher hasherForeign = hf.newHasher();
+            for (String string : entry.getKey()) {
+                Integer value = (Integer)row.get(string);
+                hasherForeign = hasherForeign.putInt(value);
+            }
+            indexes[count] = foreignSQLtoGraphTableDetail.getMappingMap().get(hasherForeign.hash().asInt()) + foreignSQLtoGraphTableDetail.getFirstIndex();
+            count++;
+        }
+        Map<String, Object> map = new HashMap<>();
+        for (String field : fields) {
+            Object object = row.get(field);
+            if(object != null) {
+                map.put(field,convertValue(object));
+            }
+        }
+
+        batchInserter.createRelationship(indexes[1],indexes[0], SQLtoGraphTableDetail.getTableName()::toUpperCase,map);
     }
 
     private void handleOneRowForRelationship(SQLtoGraphTableDetail SQLtoGraphTableDetail, int currentValue, Map<String, Object> row) {
@@ -124,7 +166,7 @@ public class GraphCreationDao {
                 hasherForeign = hasherForeign.putInt(value);
             }
             int foreignNodeIndex = foreignSQLtoGraphTableDetail.getFirstIndex() + foreignSQLtoGraphTableDetail.getMappingMap().get(hasherForeign.hash().asInt());
-            batchInserter.createRelationship(primaryNodeIndex,foreignNodeIndex, foreignTable.concat(SQLtoGraphTableDetail.getTableName())::toUpperCase,null);
+            batchInserter.createRelationship(primaryNodeIndex,foreignNodeIndex, foreignTable.concat(entry.getKey().stream().map(x -> x).collect(Collectors.joining()))::toUpperCase,null);
         }
     }
 

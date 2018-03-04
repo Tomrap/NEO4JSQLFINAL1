@@ -4,6 +4,7 @@ import com.GraphToSQL.Domain.GraphToSQLTableDetail;
 import com.GraphToSQL.Domain.MyNode;
 import com.GraphToSQL.Domain.TableRow;
 import com.SQLToGraph.Dao.SQLImportDao;
+import org.apache.commons.compress.utils.IOUtils;
 import org.jooq.*;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
@@ -12,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -51,13 +52,19 @@ public class SQLRowToSQLConverter {
         return SQLDataType.BLOB;
     }
 
-    private Object convertValue(Object value) {
+    private Object convertValue(Object value) throws IOException, SQLException {
 
         //TODO convert to BLOB
         if(value instanceof Object[]) {
-            return null;
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(value);
+            oos.flush();
+            oos.close();
+            bos.close();
+            byte [] data = bos.toByteArray();
+            return new javax.sql.rowset.serial.SerialBlob(data);
         }
-
         return value;
     }
 

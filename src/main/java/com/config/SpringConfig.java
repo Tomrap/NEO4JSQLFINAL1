@@ -39,7 +39,7 @@ public class SpringConfig {
     @Lazy
     @Bean
     public BatchInserter batchInserter() throws IOException {
-        return BatchInserters.inserter(new File( "C:\\Users\\John\\Documents\\Neo4j\\sakila.db" ));
+        return BatchInserters.inserter(new File( "C:\\Users\\John\\Documents\\Neo4j\\domyslny.db" ));
     }
 
     //path to SQL database
