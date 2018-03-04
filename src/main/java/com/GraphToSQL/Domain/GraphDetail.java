@@ -1,10 +1,9 @@
 package com.GraphToSQL.Domain;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
-/**
- * Created by John on 2018-02-18.
- */
+
 public class GraphDetail {
 
     private Map<String, Map<Long, MyNode>> allMyNodes;

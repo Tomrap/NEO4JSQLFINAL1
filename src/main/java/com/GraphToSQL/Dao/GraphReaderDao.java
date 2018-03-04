@@ -32,9 +32,7 @@ public class GraphReaderDao {
         for(Node node : allNodes) {
 
             // important assumption - all nodes have proper labels as the nodes are grouped depending on their labels
-            //TODO make sure that labels are always in the same order - yes do this
             Iterable<Label> labels = node.getLabels();
-
 
             String oneLabel = StreamSupport.stream(labels.spliterator(), false).map(Object::toString).collect(Collectors.joining(delimiter));
 

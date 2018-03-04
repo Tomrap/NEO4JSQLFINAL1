@@ -2,11 +2,11 @@ package com.main;
 
 import com.GraphToSQL.Domain.GraphDetail;
 import com.GraphToSQL.Domain.GraphToSQLTableDetail;
-import com.SQLToGraph.Domain.SQLtoGraphTableDetail;
 import com.GraphToSQL.Domain.TableRow;
 import com.GraphToSQL.Service.GraphToSQLRowConverter;
 import com.GraphToSQL.Service.SQLRowToSQLConverter;
 import com.GraphToSQL.Service.SQLSchemaCreator;
+import com.SQLToGraph.Domain.SQLtoGraphTableDetail;
 import com.SQLToGraph.Service.GraphGenerator;
 import com.SQLToGraph.Service.SQLService;
 import org.apache.log4j.Logger;

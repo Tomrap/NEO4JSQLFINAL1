@@ -4,21 +4,23 @@ import com.GraphToSQL.Domain.GraphToSQLTableDetail;
 import com.GraphToSQL.Domain.MyNode;
 import com.GraphToSQL.Domain.TableRow;
 import com.SQLToGraph.Dao.SQLImportDao;
-import org.apache.commons.compress.utils.IOUtils;
 import org.jooq.*;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import static org.jooq.impl.DSL.*;
 
@@ -67,6 +69,7 @@ public class SQLRowToSQLConverter {
     }
 
     private String escape(String value) {
+        //TODO wont work in case of already escaped value (starts with '`')
         return "`" + value + "`";
     }
 

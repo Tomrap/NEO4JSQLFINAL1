@@ -2,9 +2,7 @@ package com.GraphToSQL.Domain;
 
 import java.util.Map;
 
-/**
- * Created by John on 2018-02-18.
- */
+
 public class MyNode {
 
     private Map<String,Object> values;

@@ -1,7 +1,7 @@
 package com.SQLToGraph.Service;
 
-import com.SQLToGraph.Domain.SQLtoGraphTableDetail;
 import com.SQLToGraph.Dao.GraphCreationDao;
+import com.SQLToGraph.Domain.SQLtoGraphTableDetail;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -24,31 +24,31 @@ public class GraphGenerator {
     @Autowired @Lazy
     private GraphCreationDao graphCreationDao;
 
-    public void generate(List<List<Map<String, Object>>> allData, List<SQLtoGraphTableDetail> SQLtoGraphTableDetailList) throws SQLException, IOException, ClassNotFoundException {
+    public void generate(List<List<Map<String, Object>>> allData, List<SQLtoGraphTableDetail> sQLtoGraphTableDetailList) throws SQLException, IOException, ClassNotFoundException {
 
         logger.info("Start generating graph database");
 
-        generateNodes(SQLtoGraphTableDetailList,allData);
-        generateRelationships(SQLtoGraphTableDetailList,allData);
+        generateNodes(sQLtoGraphTableDetailList,allData);
+        generateRelationships(sQLtoGraphTableDetailList,allData);
     }
 
-    private void generateNodes(List<SQLtoGraphTableDetail> SQLtoGraphTableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException, ClassNotFoundException {
+    private void generateNodes(List<SQLtoGraphTableDetail> sQLtoGraphTableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException, ClassNotFoundException {
 
         logger.info("Start generating nodes");
 
-        Iterator<SQLtoGraphTableDetail> it1 = SQLtoGraphTableDetailList.iterator();
+        Iterator<SQLtoGraphTableDetail> it1 = sQLtoGraphTableDetailList.iterator();
         Iterator<List<Map<String, Object>>> it2;
         it2 = allData.iterator();
         int firstIndex = 0;
 
         while (it1.hasNext() && it2.hasNext()) {
 
-            SQLtoGraphTableDetail SQLtoGraphTableDetail = it1.next();
+            SQLtoGraphTableDetail sQLtoGraphTableDetail = it1.next();
             List<Map<String, Object>> row = it2.next();
-            if(!SQLtoGraphTableDetail.isJunctionTable()) {
-                SQLtoGraphTableDetail.setFirstIndex(firstIndex);
+            if(!sQLtoGraphTableDetail.isJunctionTable()) {
+                sQLtoGraphTableDetail.setFirstIndex(firstIndex);
                 firstIndex += row.size();
-                graphCreationDao.createNodes(SQLtoGraphTableDetail, row);
+                graphCreationDao.createNodes(sQLtoGraphTableDetail, row);
             }
 
         }
@@ -56,18 +56,18 @@ public class GraphGenerator {
         logger.info("Finished generating nodes");
     }
 
-    private void generateRelationships(List<SQLtoGraphTableDetail> SQLtoGraphTableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException, ClassNotFoundException {
+    private void generateRelationships(List<SQLtoGraphTableDetail> sQLtoGraphTableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException, ClassNotFoundException {
 
         logger.info("Start generating relationships for database");
 
-        Iterator<SQLtoGraphTableDetail> it1 = SQLtoGraphTableDetailList.iterator();
+        Iterator<SQLtoGraphTableDetail> it1 = sQLtoGraphTableDetailList.iterator();
         Iterator<List<Map<String, Object>>> it2;
         it2 = allData.iterator();
 
         while (it1.hasNext() && it2.hasNext()) {
-            SQLtoGraphTableDetail SQLtoGraphTableDetail = it1.next();
+            SQLtoGraphTableDetail sQLtoGraphTableDetail = it1.next();
             List<Map<String, Object>> row = it2.next();
-            graphCreationDao.createRelationships(SQLtoGraphTableDetail, row);
+            graphCreationDao.createRelationships(sQLtoGraphTableDetail, row);
         }
         logger.info("Finished generating relationships for database");
     }
