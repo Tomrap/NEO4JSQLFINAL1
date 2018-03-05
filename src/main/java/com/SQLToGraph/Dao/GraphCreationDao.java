@@ -59,7 +59,7 @@ public class GraphCreationDao {
 
         logger.info("Start generating nodes for " + sQLtoGraphTableDetail.getTableName());
 
-        HashMap<Integer,Integer> mappingMap= new HashMap<>();
+        HashMap<Integer, Integer> mappingMap = new HashMap<>();
 
         List<String> fields = sQLtoGraphTableDetail.getFields();
 
@@ -81,17 +81,17 @@ public class GraphCreationDao {
         Map<String, Object> map = new HashMap<>();
         for (String field : fields) {
             Object object = row.get(field);
-            if(object != null) {
-                map.put(field,convertValue(object));
+            if (object != null) {
+                map.put(field, convertValue(object));
             }
         }
 
         Hasher hasher = hf.newHasher();
-        for(String pk : sQLtoGraphTableDetail.getPk()) {
+        for (String pk : sQLtoGraphTableDetail.getPk()) {
             hasher = hasher.putInt((Integer) row.get(pk));
         }
 
-        mappingMap.put(hasher.hash().asInt(), currentIndex- sQLtoGraphTableDetail.getFirstIndex());
+        mappingMap.put(hasher.hash().asInt(), currentIndex - sQLtoGraphTableDetail.getFirstIndex());
 
         batchInserter.createNode(currentIndex, map, sQLtoGraphTableDetail::getTableName);
     }
@@ -101,7 +101,7 @@ public class GraphCreationDao {
 
         logger.info("Start generating relationships for " + sQLtoGraphTableDetail.getTableName());
 
-        if(sQLtoGraphTableDetail.isJunctionTable()) {
+        if (sQLtoGraphTableDetail.isJunctionTable()) {
             for (Map<String, Object> row : rs) {
                 List<String> fields = sQLtoGraphTableDetail.getFields();
                 handleOneRowForRelationshipInJunctionTable(sQLtoGraphTableDetail, row, fields);
@@ -130,7 +130,7 @@ public class GraphCreationDao {
             SQLtoGraphTableDetail foreignSQLtoGraphTableDetail = sQLtoGraphTableDetail.getTable(foreignTable);
             Hasher hasherForeign = hf.newHasher();
             for (String string : entry.getKey()) {
-                Integer value = (Integer)row.get(string);
+                Integer value = (Integer) row.get(string);
                 hasherForeign = hasherForeign.putInt(value);
             }
             indexes[count] = foreignSQLtoGraphTableDetail.getMappingMap().get(hasherForeign.hash().asInt()) + foreignSQLtoGraphTableDetail.getFirstIndex();
@@ -139,12 +139,12 @@ public class GraphCreationDao {
         Map<String, Object> map = new HashMap<>();
         for (String field : fields) {
             Object object = row.get(field);
-            if(object != null) {
-                map.put(field,convertValue(object));
+            if (object != null) {
+                map.put(field, convertValue(object));
             }
         }
 
-        batchInserter.createRelationship(indexes[1],indexes[0], sQLtoGraphTableDetail.getTableName()::toUpperCase,map);
+        batchInserter.createRelationship(indexes[1], indexes[0], sQLtoGraphTableDetail.getTableName()::toUpperCase, map);
     }
 
     private void handleOneRowForRelationship(SQLtoGraphTableDetail sQLtoGraphTableDetail, int currentValue, Map<String, Object> row) {
@@ -159,15 +159,15 @@ public class GraphCreationDao {
             Hasher hasherForeign = hf.newHasher();
             for (String string : entry.getKey()) {
 
-                Integer value = (Integer)row.get(string);
-                if(value == null) {
+                Integer value = (Integer) row.get(string);
+                if (value == null) {
                     continue outerloop;
                 }
                 hasherForeign = hasherForeign.putInt(value);
             }
             int foreignNodeIndex = foreignSQLtoGraphTableDetail.getFirstIndex() + foreignSQLtoGraphTableDetail.getMappingMap().get(hasherForeign.hash().asInt());
-            batchInserter.createRelationship(primaryNodeIndex,foreignNodeIndex,
-                    sQLtoGraphTableDetail.getTableName().concat("::").concat(foreignTable.concat(entry.getKey().stream().map(x -> x).collect(Collectors.joining())))::toUpperCase,null);
+            batchInserter.createRelationship(primaryNodeIndex, foreignNodeIndex,
+                    sQLtoGraphTableDetail.getTableName().concat("::").concat(foreignTable.concat(entry.getKey().stream().map(x -> x).collect(Collectors.joining())))::toUpperCase, null);
         }
     }
 

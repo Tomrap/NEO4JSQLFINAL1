@@ -29,7 +29,7 @@ public class SQLtoGraphTableDetail {
     private List<String> fields;
     private Map<List<String>, String> fks;
     private String tableName;
-    boolean areThereAnyForeignKeysToThisTable = false;
+    private boolean areThereAnyForeignKeysToThisTable = false;
 
     private int firstIndex;
     private HashMap<Integer, Integer> mappingMap;
@@ -66,7 +66,7 @@ public class SQLtoGraphTableDetail {
         this.mappingMap = mappingMap;
     }
 
-    public static void addtoTables(SQLtoGraphTableDetail SQLtoGraphTableDetail) {
+    public static void addToTables(SQLtoGraphTableDetail SQLtoGraphTableDetail) {
         TABLES.put(SQLtoGraphTableDetail.getTableName(), SQLtoGraphTableDetail);
     }
 
@@ -88,10 +88,6 @@ public class SQLtoGraphTableDetail {
 
     public void setPk(List<String> pk) {
         this.pk = pk;
-    }
-
-    public boolean isAreThereAnyForeignKeysToThisTable() {
-        return areThereAnyForeignKeysToThisTable;
     }
 
     public void setAreThereAnyForeignKeysToThisTable(boolean areThereAnyForeignKeysToThisTable) {

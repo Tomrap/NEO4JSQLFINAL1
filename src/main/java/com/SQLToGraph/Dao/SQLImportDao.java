@@ -38,7 +38,7 @@ public class SQLImportDao {
 
         List<List<Map<String, Object>>> allData = new ArrayList<>();
 
-        for(SQLtoGraphTableDetail SQLtoGraphTableDetail : SQLtoGraphTableDetailList) {
+        for (SQLtoGraphTableDetail SQLtoGraphTableDetail : SQLtoGraphTableDetailList) {
             allData.add(readTableData(SQLtoGraphTableDetail));
         }
 
@@ -52,7 +52,7 @@ public class SQLImportDao {
 
         logger.info("Started readTableData for " + table.getTableName());
 
-        String tableName = SQLtoGraphTableDetail.schemaName+"."+ table.getTableName();
+        String tableName = SQLtoGraphTableDetail.schemaName + "." + table.getTableName();
 
         String query = String.format("SELECT * from " + tableName);
 

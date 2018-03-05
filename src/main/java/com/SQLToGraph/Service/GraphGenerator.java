@@ -21,15 +21,16 @@ public class GraphGenerator {
 
     private static final Logger logger = Logger.getLogger(GraphGenerator.class);
 
-    @Autowired @Lazy
+    @Autowired
+    @Lazy
     private GraphCreationDao graphCreationDao;
 
     public void generate(List<List<Map<String, Object>>> allData, List<SQLtoGraphTableDetail> sQLtoGraphTableDetailList) throws SQLException, IOException, ClassNotFoundException {
 
         logger.info("Start generating graph database");
 
-        generateNodes(sQLtoGraphTableDetailList,allData);
-        generateRelationships(sQLtoGraphTableDetailList,allData);
+        generateNodes(sQLtoGraphTableDetailList, allData);
+        generateRelationships(sQLtoGraphTableDetailList, allData);
     }
 
     private void generateNodes(List<SQLtoGraphTableDetail> sQLtoGraphTableDetailList, List<List<Map<String, Object>>> allData) throws SQLException, IOException, ClassNotFoundException {
@@ -45,7 +46,7 @@ public class GraphGenerator {
 
             SQLtoGraphTableDetail sQLtoGraphTableDetail = it1.next();
             List<Map<String, Object>> row = it2.next();
-            if(!sQLtoGraphTableDetail.isJunctionTable()) {
+            if (!sQLtoGraphTableDetail.isJunctionTable()) {
                 sQLtoGraphTableDetail.setFirstIndex(firstIndex);
                 firstIndex += row.size();
                 graphCreationDao.createNodes(sQLtoGraphTableDetail, row);

@@ -6,25 +6,27 @@ import java.util.Map;
 /**
  * Created by John on 2018-03-01.
  */
-public class GraphToSQLTableDetail{
+public class GraphToSQLTableDetail {
 
     public static final String schemaName = "sakila1";
 
     private String tableName;
     private List<String> pk;
-    private List<Map.Entry<String,String>> graphFks;
+    private List<Map.Entry<String, String>> graphFks;
     private Map<String, Object> columnsAndTypes;
 
-    public List<Map.Entry<String,String>> getGraphFks() {
+    public List<Map.Entry<String, String>> getGraphFks() {
         return graphFks;
     }
-    public void setGraphFks(List<Map.Entry<String,String>> graphFks) {
+
+    public void setGraphFks(List<Map.Entry<String, String>> graphFks) {
         this.graphFks = graphFks;
     }
 
     public Map<String, Object> getColumnsAndTypes() {
         return columnsAndTypes;
     }
+
     public void setColumnsAndTypes(Map<String, Object> columnsAndTypes) {
         this.columnsAndTypes = columnsAndTypes;
     }
@@ -32,6 +34,7 @@ public class GraphToSQLTableDetail{
     public void setTableName(String tableName) {
         this.tableName = tableName;
     }
+
     public String getTableName() {
         return tableName;
     }
@@ -39,6 +42,7 @@ public class GraphToSQLTableDetail{
     public List<String> getPk() {
         return pk;
     }
+
     public void setPk(List<String> pk) {
         this.pk = pk;
     }

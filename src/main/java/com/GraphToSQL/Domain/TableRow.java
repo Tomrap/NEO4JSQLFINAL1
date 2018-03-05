@@ -11,14 +11,14 @@ public class TableRow {
     private MyNode myNode;
     private Map<String, Integer> foreignKeys = new HashMap<>();
     private Map<String, Object> relationshipProperties = new HashMap<>();
-    private int SQLID;
+    private int SQLid;
 
-    public void setSQLID(int SQLID) {
-        this.SQLID = SQLID;
+    public void setSQLid(int SQLid) {
+        this.SQLid = SQLid;
     }
 
-    public int getSQLID() {
-        return SQLID;
+    public int getSQLid() {
+        return SQLid;
     }
 
     public Map<String, Object> getRelationshipProperties() {

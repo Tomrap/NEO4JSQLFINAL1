@@ -47,7 +47,7 @@ public class SQLSchemaReader {
 
             tableList.add(sQLtoGraphTableDetail);
 
-            SQLtoGraphTableDetail.addtoTables(sQLtoGraphTableDetail);
+            SQLtoGraphTableDetail.addToTables(sQLtoGraphTableDetail);
         });
         return tableList;
     }
@@ -84,7 +84,7 @@ public class SQLSchemaReader {
                 List<String> keys = new ArrayList<>(3);
                 for (ForeignKeyColumnReference reference : columnReferences) {
                     Table otherTable = reference.getPrimaryKeyColumn().getParent();
-                    if(otherTable.equals(table)) {
+                    if (otherTable.equals(table)) {
                         areThereAnyForeignKeysToThisTable = true;
                     }
                     Table thisTable = reference.getForeignKeyColumn().getParent();

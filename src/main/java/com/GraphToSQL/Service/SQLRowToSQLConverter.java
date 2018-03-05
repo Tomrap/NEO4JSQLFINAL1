@@ -35,17 +35,17 @@ public class SQLRowToSQLConverter {
 
     private DataType inferType(Object value) {
 
-        if(value instanceof Boolean) {
-           return SQLDataType.BIT;
+        if (value instanceof Boolean) {
+            return SQLDataType.BIT;
         }
-        if(value instanceof Integer || value instanceof Byte || value instanceof Short ) {
+        if (value instanceof Integer || value instanceof Byte || value instanceof Short) {
             return SQLDataType.INTEGER;
         }
-        if(value instanceof String) {
+        if (value instanceof String) {
             return SQLDataType.VARCHAR.length(200);
         }
-        if(value instanceof Float || value instanceof Double) {
-            return SQLDataType.DECIMAL(10,5);
+        if (value instanceof Float || value instanceof Double) {
+            return SQLDataType.DECIMAL(10, 5);
         }
         if (value instanceof BigDecimal || value instanceof Long) return SQLDataType.BIGINT;
 
@@ -55,14 +55,14 @@ public class SQLRowToSQLConverter {
     private Object convertValue(Object value) throws IOException, SQLException {
 
         //TODO convert to BLOB
-        if(value instanceof Object[]) {
+        if (value instanceof Object[]) {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(value);
             oos.flush();
             oos.close();
             bos.close();
-            byte [] data = bos.toByteArray();
+            byte[] data = bos.toByteArray();
             return new javax.sql.rowset.serial.SerialBlob(data);
         }
         return value;
@@ -90,11 +90,11 @@ public class SQLRowToSQLConverter {
         Collection<Field<Object>> columnNames;
         List<InsertValuesStepN<Record>> inserts;
 
-        for(Map.Entry<String, Map<Integer, TableRow>> element: allRows.entrySet()) {
+        for (Map.Entry<String, Map<Integer, TableRow>> element : allRows.entrySet()) {
 
             inserts = new ArrayList<>();
 
-            for(Map.Entry<Integer, TableRow> row: element.getValue().entrySet()) {
+            for (Map.Entry<Integer, TableRow> row : element.getValue().entrySet()) {
 
                 rowValues = new ArrayList<>();
                 columnNames = new ArrayList<>();
@@ -102,21 +102,21 @@ public class SQLRowToSQLConverter {
                 columnNames.add(field(escape(addID(element.getKey()))));
                 MyNode myNode = row.getValue().getMyNode();
 
-                if(myNode == null) {
-                    rowValues.add(row.getValue().getSQLID());
+                if (myNode == null) {
+                    rowValues.add(row.getValue().getSQLid());
                 } else {
                     rowValues.add(myNode.getSqlID());
-                    for(Map.Entry<String, Object> myNodeValue: myNode.getValues().entrySet()) {
+                    for (Map.Entry<String, Object> myNodeValue : myNode.getValues().entrySet()) {
                         columnNames.add(field(escape(myNodeValue.getKey())));
                         rowValues.add(convertValue(myNodeValue.getValue()));
                     }
                 }
-                for(Map.Entry<String, Object> relationshipProperty: row.getValue().getRelationshipProperties().entrySet()) {
+                for (Map.Entry<String, Object> relationshipProperty : row.getValue().getRelationshipProperties().entrySet()) {
                     columnNames.add(field(escape(relationshipProperty.getKey())));
                     rowValues.add(convertValue(relationshipProperty.getValue()));
                 }
 
-                for(Map.Entry<String, Integer> foreignKey : row.getValue().getForeignKeys().entrySet()) {
+                for (Map.Entry<String, Integer> foreignKey : row.getValue().getForeignKeys().entrySet()) {
                     columnNames.add(field(escape(foreignKey.getKey())));
                     rowValues.add(foreignKey.getValue());
                 }
@@ -135,7 +135,7 @@ public class SQLRowToSQLConverter {
         create.createSchema(schema).execute();
         connection.setCatalog(schema);
 
-        for(GraphToSQLTableDetail graphToSQLTableDetail : graphToSQLTableDetails) {
+        for (GraphToSQLTableDetail graphToSQLTableDetail : graphToSQLTableDetails) {
 
             CreateTableAsStep<Record> table = create.createTable(graphToSQLTableDetail.getTableName());
 
@@ -147,8 +147,8 @@ public class SQLRowToSQLConverter {
                 table.column(element.getKey(), inferType(element.getValue()));
             }
 
-            for(Map.Entry<String, String> element: graphToSQLTableDetail.getGraphFks()) {
-                table.column(element.getValue(),  SQLDataType.INTEGER).getSQL();
+            for (Map.Entry<String, String> element : graphToSQLTableDetail.getGraphFks()) {
+                table.column(element.getValue(), SQLDataType.INTEGER).getSQL();
             }
 
             for (String element : graphToSQLTableDetail.getPk()) {

@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class MyNode {
 
-    private Map<String,Object> values;
+    private Map<String, Object> values;
     private int sqlID;
 
     public int getSqlID() {

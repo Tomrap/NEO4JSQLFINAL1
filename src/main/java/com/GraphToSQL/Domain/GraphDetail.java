@@ -7,7 +7,7 @@ import java.util.Map;
 public class GraphDetail {
 
     private Map<String, Map<Long, MyNode>> allMyNodes;
-    private Map<MyRelationshipType,List<MyRelationship>> allMyRelationships;
+    private Map<MyRelationshipType, List<MyRelationship>> allMyRelationships;
 
     public GraphDetail(Map<String, Map<Long, MyNode>> allMyNodes, Map<MyRelationshipType, List<MyRelationship>> allMyRelationships) {
         this.allMyNodes = allMyNodes;

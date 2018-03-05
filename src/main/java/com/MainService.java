@@ -51,7 +51,7 @@ public class MainService {
 
         List<SQLtoGraphTableDetail> tables = SQLSchemaReader.extractSchema();
         List<List<Map<String, Object>>> allData = sqlService.readAllTables(tables);
-        graphGenerator.generate(allData,tables);
+        graphGenerator.generate(allData, tables);
     }
 
     public void convertNEO4JtoSQL() throws SQLException, IOException {

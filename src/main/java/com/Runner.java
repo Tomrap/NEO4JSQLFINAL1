@@ -9,8 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Runner implements CommandLineRunner {
 
-    private @Autowired
-    MainService mainService;
+    @Autowired
+    private MainService mainService;
 
     public static void main(String[] args) throws Exception {
 

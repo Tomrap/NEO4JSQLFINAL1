@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -29,7 +32,7 @@ public class GraphReaderDao {
     private Map<String, Map<Long, MyNode>> readNodes(ResourceIterable<Node> allNodes) {
         Map<String, Map<Long, MyNode>> allMyNodes = new HashMap<>();
 
-        for(Node node : allNodes) {
+        for (Node node : allNodes) {
 
             // important assumption - all nodes have proper labels as the nodes are grouped depending on their labels
             Iterable<Label> labels = node.getLabels();
@@ -38,16 +41,16 @@ public class GraphReaderDao {
 
             MyNode myNode = new MyNode(node.getAllProperties());
 
-            allMyNodes.computeIfAbsent(oneLabel, k -> new HashMap<>()).put(node.getId(),myNode);
+            allMyNodes.computeIfAbsent(oneLabel, k -> new HashMap<>()).put(node.getId(), myNode);
 
         }
         return allMyNodes;
     }
 
-    private Map<MyRelationshipType,List<MyRelationship>> readRelationships(ResourceIterable<Relationship> allRelationships) {
-        Map<MyRelationshipType,List<MyRelationship>> allMyRelationships = new HashMap<>();
+    private Map<MyRelationshipType, List<MyRelationship>> readRelationships(ResourceIterable<Relationship> allRelationships) {
+        Map<MyRelationshipType, List<MyRelationship>> allMyRelationships = new HashMap<>();
 
-        for(Relationship relationship: allRelationships) {
+        for (Relationship relationship : allRelationships) {
 
             Node startNode = relationship.getStartNode();
             Node endNode = relationship.getEndNode();
@@ -58,9 +61,9 @@ public class GraphReaderDao {
             String label = relationship.getType().name();
 
             MyRelationship myRelationship = new MyRelationship(startNode.getId(),
-                    endNode.getId(),relationship.getAllProperties());
+                    endNode.getId(), relationship.getAllProperties());
 
-            allMyRelationships.computeIfAbsent(new MyRelationshipType(label,firstNodeLabel,secondNodeLabel), k-> new ArrayList<>()).add(myRelationship);
+            allMyRelationships.computeIfAbsent(new MyRelationshipType(label, firstNodeLabel, secondNodeLabel), k -> new ArrayList<>()).add(myRelationship);
         }
 
         return allMyRelationships;
@@ -68,12 +71,11 @@ public class GraphReaderDao {
 
     public GraphDetail readGraph() {
 
-        try ( Transaction tx = graphDatabaseService.beginTx() )
-        {
+        try (Transaction tx = graphDatabaseService.beginTx()) {
             Map<String, Map<Long, MyNode>> nodes = readNodes(graphDatabaseService.getAllNodes());
             Map<MyRelationshipType, List<MyRelationship>> relationships = readRelationships(graphDatabaseService.getAllRelationships());
             tx.success();
-            return new GraphDetail(nodes,relationships);
+            return new GraphDetail(nodes, relationships);
         }
     }
 }

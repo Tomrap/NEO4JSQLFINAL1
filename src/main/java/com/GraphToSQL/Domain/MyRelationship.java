@@ -27,5 +27,5 @@ public class MyRelationship {
 
     private long firstNode;
     private long secondNode;
-    private Map<String,Object> values;
+    private Map<String, Object> values;
 }

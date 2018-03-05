@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by John on 2018-02-18.
@@ -44,21 +46,20 @@ public class GraphToSQLRowConverter {
                 MyNode firstNode = allMyNodes.get(key.getFirstNodeLabel()).get(myRelationship.getFirstNode());
                 MyNode secondNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getSecondNode());
                 TableRow tableRow;
-                tableRow =  assignForeignKeysInJunctionTable(key, firstNode, secondNode,myRelationship);
+                tableRow = assignForeignKeysInJunctionTable(key, firstNode, secondNode, myRelationship);
                 allRows.computeIfAbsent(key.getLabel(), k -> new HashMap<>()).put(tableRow.hashCode(), tableRow);
             }
-        }
-        else if (key.isFirstNodeForeignKey()) {
+        } else if (key.isFirstNodeForeignKey()) {
             for (MyRelationship myRelationship : element.getValue()) {
                 MyNode firstNode = allMyNodes.get(key.getFirstNodeLabel()).get(myRelationship.getFirstNode());
                 MyNode secondNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getSecondNode());
-                createRowWithOneForeignKey(allRows,key.getSecondNodeLabel(), secondNode,firstNode,myRelationship,key);
+                createRowWithOneForeignKey(allRows, key.getSecondNodeLabel(), secondNode, firstNode, myRelationship, key);
             }
         } else {
             for (MyRelationship myRelationship : element.getValue()) {
                 MyNode firstNode = allMyNodes.get(key.getFirstNodeLabel()).get(myRelationship.getFirstNode());
                 MyNode secondNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getSecondNode());
-                createRowWithOneForeignKey(allRows,key.getFirstNodeLabel(), firstNode,secondNode,myRelationship,key);
+                createRowWithOneForeignKey(allRows, key.getFirstNodeLabel(), firstNode, secondNode, myRelationship, key);
             }
         }
 
@@ -69,7 +70,7 @@ public class GraphToSQLRowConverter {
         for (Map.Entry<String, Map<Integer, TableRow>> element : allRows.entrySet()) {
             count = 1;
             for (TableRow tableRow : element.getValue().values()) {
-                tableRow.setSQLID(count);
+                tableRow.setSQLid(count);
                 count++;
             }
         }

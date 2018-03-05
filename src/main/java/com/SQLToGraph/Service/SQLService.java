@@ -18,7 +18,8 @@ public class SQLService {
 
     private static final Logger logger = Logger.getLogger(SQLService.class);
 
-    @Autowired @Lazy
+    @Autowired
+    @Lazy
     private com.SQLToGraph.Dao.SQLImportDao SQLImportDao;
 
     public List<List<Map<String, Object>>> readAllTables(List<SQLtoGraphTableDetail> SQLtoGraphTableDetailList) throws SQLException {
