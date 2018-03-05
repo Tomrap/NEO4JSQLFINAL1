@@ -52,7 +52,6 @@ public class GraphGenerator {
             }
 
         }
-
         logger.info("Finished generating nodes");
     }
 

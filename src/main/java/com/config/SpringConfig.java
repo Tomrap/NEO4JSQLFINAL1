@@ -5,10 +5,12 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -18,13 +20,8 @@ import java.io.IOException;
 /**
  * Created by John on 2017-01-08.
  */
-
-
 @Configuration
-@ComponentScan(basePackages="com"
-        ,excludeFilters={
-        @ComponentScan.Filter(type= FilterType.ANNOTATION, value=EnableWebMvc.class)
-})
+@ComponentScan(basePackages="com")
 public class SpringConfig {
 
     //SQL to NEO4J - path to NEO4J database

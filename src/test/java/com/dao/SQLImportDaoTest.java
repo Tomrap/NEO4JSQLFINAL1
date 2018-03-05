@@ -1,8 +1,8 @@
 package com.dao;
 
 import com.config.SpringConfig;
-import com.config.WebConfig;
-import com.main.MainService;
+import com.MainService;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +18,16 @@ import java.sql.SQLException;
  * Created by John on 2017-01-08.
  */
 
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={SpringConfig.class, WebConfig.class})
+@ContextConfiguration(classes={SpringConfig.class})
 @WebAppConfiguration
 public class SQLImportDaoTest {
 
 
     @Autowired
     private MainService mainService;
+
 
 
     @Test

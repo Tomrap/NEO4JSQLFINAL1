@@ -1,4 +1,4 @@
-package com.main;
+package com;
 
 import com.GraphToSQL.Domain.GraphDetail;
 import com.GraphToSQL.Domain.GraphToSQLTableDetail;
@@ -22,6 +22,7 @@ import java.util.Map;
 /**
  * Created by John on 2017-10-20.
  */
+
 @Service
 public class MainService {
 
@@ -44,6 +45,7 @@ public class MainService {
 
     @Autowired
     private SQLRowToSQLConverter SQLRowToSqlConverter;
+
 
     public void convertSQLtoNEO4J() throws SQLException, SchemaCrawlerException, IOException, ClassNotFoundException {
 
