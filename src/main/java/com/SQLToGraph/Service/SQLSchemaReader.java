@@ -2,7 +2,10 @@ package com.SQLToGraph.Service;
 
 import com.SQLToGraph.Dao.SQLImportDao;
 import com.SQLToGraph.Domain.SQLtoGraphTableDetail;
+import com.config.SpringConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import schemacrawler.schema.*;
 import schemacrawler.schemacrawler.InclusionRule;
@@ -18,14 +21,19 @@ import java.util.*;
  * Created by John on 2017-10-20.
  */
 @Service
+@PropertySource("classpath:config.properties")
 public class SQLSchemaReader {
+
+
+    @Value("${SqlToGraph.schemaName}")
+    private String schema;
 
     @Autowired
     private SQLImportDao SQLImportDao;
 
     public List<SQLtoGraphTableDetail> extractSchema() throws SQLException, SchemaCrawlerException {
 
-        final String schemaName = SQLtoGraphTableDetail.schemaName;
+        final String schemaName = schema;
 
         ArrayList<SQLtoGraphTableDetail> tableList = new ArrayList<SQLtoGraphTableDetail>();
 

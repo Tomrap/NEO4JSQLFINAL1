@@ -23,7 +23,6 @@ import java.util.*;
 public class SQLtoGraphTableDetail {
 
     private static final Map<String, SQLtoGraphTableDetail> TABLES = new LinkedHashMap<>();
-    public static final String schemaName = "sakila";
 
     private List<String> pk;
     private List<String> fields;

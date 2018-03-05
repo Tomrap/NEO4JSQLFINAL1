@@ -24,22 +24,16 @@ import java.sql.SQLException;
 @WebAppConfiguration
 public class SQLImportDaoTest {
 
-
     @Autowired
     private MainService mainService;
 
-
-
     @Test
     public void convertSQLtoNEO4JTest() throws SQLException, SchemaCrawlerException, IOException, ClassNotFoundException {
-
-        mainService.convertSQLtoNEO4J();
-
+        mainService.convertSQLtoGraph();
     }
 
     @Test
     public void convertNEO4JtoSQLTest() throws SQLException, IOException {
-        mainService.convertNEO4JtoSQL();
+        mainService.convertGraphToSQL();
     }
-
 }

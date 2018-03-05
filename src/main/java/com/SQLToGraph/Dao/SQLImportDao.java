@@ -1,8 +1,11 @@
 package com.SQLToGraph.Dao;
 
 import com.SQLToGraph.Domain.SQLtoGraphTableDetail;
+import com.config.SpringConfig;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +18,11 @@ import java.util.Map;
  * Created by John on 2017-01-08.
  */
 @Repository
+@PropertySource("classpath:config.properties")
 public class SQLImportDao {
+
+    @Value("${SqlToGraph.schemaName}")
+    private String schemaName;
 
     private static final Logger logger = Logger.getLogger(SQLImportDao.class);
 
@@ -52,7 +59,7 @@ public class SQLImportDao {
 
         logger.info("Started readTableData for " + table.getTableName());
 
-        String tableName = SQLtoGraphTableDetail.schemaName + "." + table.getTableName();
+        String tableName = schemaName + "." + table.getTableName();
 
         String query = String.format("SELECT * from " + tableName);
 

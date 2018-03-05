@@ -8,8 +8,6 @@ import java.util.Map;
  */
 public class GraphToSQLTableDetail {
 
-    public static final String schemaName = "sakila1";
-
     private String tableName;
     private List<String> pk;
     private List<Map.Entry<String, String>> graphFks;

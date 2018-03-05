@@ -47,14 +47,14 @@ public class MainService {
     private SQLRowToSQLConverter SQLRowToSqlConverter;
 
 
-    public void convertSQLtoNEO4J() throws SQLException, SchemaCrawlerException, IOException, ClassNotFoundException {
+    public void convertSQLtoGraph() throws SQLException, SchemaCrawlerException, IOException, ClassNotFoundException {
 
         List<SQLtoGraphTableDetail> tables = SQLSchemaReader.extractSchema();
         List<List<Map<String, Object>>> allData = sqlService.readAllTables(tables);
         graphGenerator.generate(allData, tables);
     }
 
-    public void convertNEO4JtoSQL() throws SQLException, IOException {
+    public void convertGraphToSQL() throws SQLException, IOException {
 
         GraphDetail graphDetail = graphToSQLRowConverter.read();
         List<GraphToSQLTableDetail> schema = sqlSchemaCreator.createSchema(graphDetail);

@@ -1,8 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.mkyong.core</groupId>
-	<artifactId>Spring3Example</artifactId>
+	<artifactId>Converter</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
 
@@ -14,14 +13,6 @@
 
 	<build>
 		<plugins>
-			<!--<plugin>-->
-				<!--<groupId>org.apache.maven.plugins</groupId>-->
-				<!--<artifactId>maven-compiler-plugin</artifactId>-->
-				<!--<configuration>-->
-					<!--<source>1.8</source>-->
-					<!--<target>1.8</target>-->
-				<!--</configuration>-->
-			<!--</plugin>-->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -36,7 +27,7 @@
             </plugin>
         </plugins>
 	</build>
-	<name>Spring3Example</name>
+	<name>Converter</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -45,16 +36,6 @@
 	</properties>
 
 	<dependencies>
-
-		<!-- https://mvnrepository.com/artifact/com.oracle/ojdbc14
-
-		 local Dependency - need to install driver manually using maven
-		 https://www.mkyong.com/maven/how-to-add-oracle-jdbc-driver-in-your-maven-local-repository/
-
-		 note: Tomcat is using his own jdbc driver so it is not needed
-
-		 -->
-
 		<!-- https://mvnrepository.com/artifact/net.sourceforge.schemacrawler/schemacrawler -->
 		<dependency>
 			<groupId>net.sourceforge.schemacrawler</groupId>
@@ -66,7 +47,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
-
 
 		<!-- https://mvnrepository.com/artifact/org.neo4j/neo4j -->
 		<dependency>
@@ -82,23 +62,12 @@
 			<version>1.4.4</version>
 		</dependency>
 
-
-
 		<!-- https://mvnrepository.com/artifact/net.sourceforge.schemacrawler/schemacrawler -->
 		<dependency>
 			<groupId>net.sourceforge.schemacrawler</groupId>
 			<artifactId>schemacrawler</artifactId>
 			<version>10.10.05</version>
 		</dependency>
-
-		<!--for tests-->
-		<!--<dependency>-->
-			<!--<groupId>javax.servlet</groupId>-->
-			<!--<artifactId>javax.servlet-api</artifactId>-->
-			<!--<version>3.0.1</version>-->
-			<!--<scope>provided</scope>-->
-		<!--</dependency>-->
-
 
 		<dependency>
 			<groupId>com.oracle</groupId>
@@ -156,20 +125,12 @@
 			<version>3.10.5</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-
-
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<version>${spring.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!--<dependency>-->
-			<!--<groupId>org.springframework</groupId>-->
-			<!--<artifactId>spring-webmvc</artifactId>-->
-			<!--<version>${spring.version}</version>-->
-		<!--</dependency>-->
 
 		<dependency>
 			<groupId>log4j</groupId>
@@ -183,8 +144,6 @@
 			<artifactId>guava</artifactId>
 			<version>23.5-jre</version>
 		</dependency>
-
-
 
 	</dependencies>
 </project>

@@ -4,11 +4,14 @@ import com.GraphToSQL.Domain.GraphToSQLTableDetail;
 import com.GraphToSQL.Domain.MyNode;
 import com.GraphToSQL.Domain.TableRow;
 import com.SQLToGraph.Dao.SQLImportDao;
+import com.config.SpringConfig;
 import org.jooq.*;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -28,7 +31,11 @@ import static org.jooq.impl.DSL.*;
  * Created by John on 2018-02-23.
  */
 @Service
+@PropertySource("classpath:config.properties")
 public class SQLRowToSQLConverter {
+
+    @Value("${GraphToSql.schemaName}")
+    private String schemaName;
 
     @Autowired
     private SQLImportDao SQLImportDao;
@@ -80,7 +87,7 @@ public class SQLRowToSQLConverter {
     public void createAndInsertSQLRows(Map<String, Map<Integer, TableRow>> allRows) throws SQLException, IOException {
 
         Connection connection = SQLImportDao.getJdbcTemplate().getDataSource().getConnection();
-        connection.setCatalog(GraphToSQLTableDetail.schemaName);
+        connection.setCatalog(schemaName);
         DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
         Settings settings = create.settings();
         settings.setDebugInfoOnStackTrace(false);
@@ -130,7 +137,7 @@ public class SQLRowToSQLConverter {
     public void createSQLTables(List<GraphToSQLTableDetail> graphToSQLTableDetails) throws SQLException, IOException {
 
         Connection connection = SQLImportDao.getJdbcTemplate().getDataSource().getConnection();
-        String schema = GraphToSQLTableDetail.schemaName;
+        String schema = schemaName;
         DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
         create.createSchema(schema).execute();
         connection.setCatalog(schema);
@@ -162,7 +169,7 @@ public class SQLRowToSQLConverter {
     public void createForeignKeysConstraints(List<GraphToSQLTableDetail> graphToSQLTableDetails) throws SQLException {
 
         Connection connection = SQLImportDao.getJdbcTemplate().getDataSource().getConnection();
-        connection.setCatalog(GraphToSQLTableDetail.schemaName);
+        connection.setCatalog(schemaName);
         DSLContext create = DSL.using(connection, SQLDialect.MYSQL);
 
         for (GraphToSQLTableDetail graphToSQLTableDetail : graphToSQLTableDetails) {
