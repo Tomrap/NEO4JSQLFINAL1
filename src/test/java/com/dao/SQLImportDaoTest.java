@@ -18,10 +18,9 @@ import java.sql.SQLException;
  * Created by John on 2017-01-08.
  */
 
-@Ignore
+//@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={SpringConfig.class})
-@WebAppConfiguration
 public class SQLImportDaoTest {
 
     @Autowired

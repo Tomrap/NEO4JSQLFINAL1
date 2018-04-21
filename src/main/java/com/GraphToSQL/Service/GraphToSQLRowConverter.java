@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by John on 2018-02-18.
@@ -43,26 +41,39 @@ public class GraphToSQLRowConverter {
         MyRelationshipType key = element.getKey();
         if (key.isFirstNodeForeignKey() && key.isSecondNodeForeignKey()) {
             for (MyRelationship myRelationship : element.getValue()) {
-                MyNode firstNode = allMyNodes.get(key.getFirstNodeLabel()).get(myRelationship.getFirstNode());
-                MyNode secondNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getSecondNode());
+                List<MyNode> firstAndSecondNode = getFirstAndSecondNode(allMyNodes, key, myRelationship);
                 TableRow tableRow;
-                tableRow = assignForeignKeysInJunctionTable(key, firstNode, secondNode, myRelationship);
-                allRows.computeIfAbsent(key.getLabel(), k -> new HashMap<>()).put(tableRow.hashCode(), tableRow);
+                tableRow = assignForeignKeysInJunctionTable(key, firstAndSecondNode.get(0), firstAndSecondNode.get(1), myRelationship);
+                allRows.computeIfAbsent(key.getFirstNodeLabel()+"_"+key.getSecondNodeLabel(), k -> new HashMap<>()).put(tableRow.hashCode(), tableRow);
             }
         } else if (key.isFirstNodeForeignKey()) {
             for (MyRelationship myRelationship : element.getValue()) {
-                MyNode firstNode = allMyNodes.get(key.getFirstNodeLabel()).get(myRelationship.getFirstNode());
-                MyNode secondNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getSecondNode());
-                createRowWithOneForeignKey(allRows, key.getSecondNodeLabel(), secondNode, firstNode, myRelationship, key);
+                List<MyNode> firstAndSecondNode = getFirstAndSecondNode(allMyNodes, key, myRelationship);
+                createRowWithOneForeignKey(allRows, key.getSecondNodeLabel(), firstAndSecondNode.get(1), firstAndSecondNode.get(0), myRelationship, key,key.getFirstNodeLabel() );
             }
         } else {
             for (MyRelationship myRelationship : element.getValue()) {
-                MyNode firstNode = allMyNodes.get(key.getFirstNodeLabel()).get(myRelationship.getFirstNode());
-                MyNode secondNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getSecondNode());
-                createRowWithOneForeignKey(allRows, key.getFirstNodeLabel(), firstNode, secondNode, myRelationship, key);
+                List<MyNode> firstAndSecondNode = getFirstAndSecondNode(allMyNodes, key, myRelationship);
+                createRowWithOneForeignKey(allRows, key.getFirstNodeLabel(), firstAndSecondNode.get(0), firstAndSecondNode.get(1), myRelationship, key,key.getSecondNodeLabel() );
             }
         }
 
+    }
+
+    private List<MyNode> getFirstAndSecondNode(Map<String, Map<Long, MyNode>> allMyNodes, MyRelationshipType key, MyRelationship myRelationship ) {
+        MyNode firstNode;
+        MyNode secondNode;
+        firstNode = allMyNodes.get(key.getFirstNodeLabel()).get(myRelationship.getFirstNode());
+        if(firstNode == null) {
+            firstNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getFirstNode());
+            secondNode = allMyNodes.get(key.getFirstNodeLabel()).get(myRelationship.getSecondNode());
+        } else {
+            secondNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getSecondNode());
+        }
+        List<MyNode> nodes = new ArrayList<>();
+        nodes.add(firstNode);
+        nodes.add(secondNode);
+        return nodes;
     }
 
     private void assignSQLPrimaryKeysToRemainingTables(Map<String, Map<Integer, TableRow>> allRows) {
@@ -80,16 +91,22 @@ public class GraphToSQLRowConverter {
         TableRow tableRow;
         tableRow = new TableRow();
         Map<String, Integer> foreignKeys = new HashMap<>();
-        foreignKeys.put(key.getFirstNodeLabel(), firstNode.getSqlID());
-        foreignKeys.put(key.getSecondNodeLabel(), secondNode.getSqlID());
+        if(key.getFirstNodeLabel().equals(key.getSecondNodeLabel())) {
+            foreignKeys.put("1_" + key.getLabel()+"_"+key.getFirstNodeLabel(), firstNode.getSqlID());
+            foreignKeys.put("2_" + key.getLabel()+"_"+key.getSecondNodeLabel(), secondNode.getSqlID());
+
+        } else {
+            foreignKeys.put(key.getLabel()+"_"+key.getFirstNodeLabel(), firstNode.getSqlID());
+            foreignKeys.put(key.getLabel()+"_"+key.getSecondNodeLabel(), secondNode.getSqlID());
+        }
         tableRow.setForeignKeys(foreignKeys);
         tableRow.setRelationshipProperties(myRelationship.getValues());
         return tableRow;
     }
 
-    private void createRowWithOneForeignKey(Map<String, Map<Integer, TableRow>> allRows, String firstNodeLabel, MyNode firstNode, MyNode secondNode, MyRelationship myRelationship, MyRelationshipType key) {
+    private void createRowWithOneForeignKey(Map<String, Map<Integer, TableRow>> allRows, String firstNodeLabel, MyNode firstNode, MyNode secondNode, MyRelationship myRelationship, MyRelationshipType key, String secondNodeLabel) {
         TableRow tableRow = allRows.get(firstNodeLabel).get(firstNode.getSqlID());
-        tableRow.getForeignKeys().put(key.getLabel(), secondNode.getSqlID());
+        tableRow.getForeignKeys().put(key.getLabel() + "_" + secondNodeLabel, secondNode.getSqlID());
         Map<String, Object> relationshipProperties = tableRow.getRelationshipProperties();
         relationshipProperties.putAll(myRelationship.getValues());
         tableRow.setRelationshipProperties(relationshipProperties);

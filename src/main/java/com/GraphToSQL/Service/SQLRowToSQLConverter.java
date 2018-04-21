@@ -155,7 +155,7 @@ public class SQLRowToSQLConverter {
             }
 
             for (Map.Entry<String, String> element : graphToSQLTableDetail.getGraphFks()) {
-                table.column(element.getValue(), SQLDataType.INTEGER).getSQL();
+                table.column(element.getValue() + "_" + element.getKey(), SQLDataType.INTEGER).getSQL();
             }
 
             for (String element : graphToSQLTableDetail.getPk()) {
@@ -175,7 +175,7 @@ public class SQLRowToSQLConverter {
         for (GraphToSQLTableDetail graphToSQLTableDetail : graphToSQLTableDetails) {
 
             for (Map.Entry<String, String> element : graphToSQLTableDetail.getGraphFks()) {
-                create.alterTable(graphToSQLTableDetail.getTableName()).add(constraint(graphToSQLTableDetail.getTableName() + "_" + element.getValue()).foreignKey(element.getValue())
+                create.alterTable(graphToSQLTableDetail.getTableName()).add(constraint(graphToSQLTableDetail.getTableName()+"_"+element.getValue() + "_" + element.getKey()).foreignKey(element.getValue() + "_" + element.getKey())
                         .references(element.getKey(), addID(element.getKey()))).execute();
             }
         }

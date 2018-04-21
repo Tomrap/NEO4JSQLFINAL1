@@ -52,12 +52,18 @@ public class MyRelationshipType {
 
         MyRelationshipType that = (MyRelationshipType) o;
 
-        return label.equals(that.label);
+        if (!label.equals(that.label)) return false;
 
+        if (!firstNodeLabel.equals(that.firstNodeLabel) && !firstNodeLabel.equals(that.secondNodeLabel)) return false;
+
+        return (firstNodeLabel.equals(that.firstNodeLabel) && secondNodeLabel.equals(that.secondNodeLabel) ) ||
+                (firstNodeLabel.equals(that.secondNodeLabel) && secondNodeLabel.equals(that.firstNodeLabel));
     }
 
     @Override
     public int hashCode() {
-        return label.hashCode();
+        int result = label.hashCode();
+        result = 29 * result + 31 * (firstNodeLabel.hashCode() + secondNodeLabel.hashCode());
+        return result;
     }
 }
