@@ -18,11 +18,11 @@ public class SQLSchemaCreator {
         Map<String, List<Map.Entry<String, String>>> foreignKeys = new ConcurrentHashMap<>();
         Map<String, Map<String, Object>> allRelationshipsProperties = new HashMap<>();
 
+        Map<String, Map<Long, MyNode>> allMyNodes = graphDetail.getAllMyNodes();
         for (Map.Entry<MyRelationshipType, List<MyRelationship>> relationshipGroup : graphDetail.getAllMyRelationships().entrySet()) {
-            decideWhichTableShouldHaveForeignKey(foreignKeys, relationshipGroup, allRelationshipsProperties);
+            decideWhichTableShouldHaveForeignKey(foreignKeys, relationshipGroup, allRelationshipsProperties , allMyNodes);
         }
 
-        Map<String, Map<Long, MyNode>> allMyNodes = graphDetail.getAllMyNodes();
         for (Map.Entry<String, Map<Long, MyNode>> nodeGroup : allMyNodes.entrySet()) {
 
             createTableDetail(graphToSQLTableDetails, foreignKeys, nodeGroup, allRelationshipsProperties);
@@ -37,17 +37,18 @@ public class SQLSchemaCreator {
 
     private void handleJunctionTable(List<GraphToSQLTableDetail> graphToSQLTableDetails, Map<String, List<Map.Entry<String, String>>> foreignKeys, Map.Entry<String, List<Map.Entry<String, String>>> element, Map<String, Map<String, Object>> allRelationshipsProperties) {
         GraphToSQLTableDetail graphToSQLTableDetail = new GraphToSQLTableDetail();
-        graphToSQLTableDetail.setTableName(element.getValue().get(0).getKey() + "_" + element.getValue().get(1).getKey());
+        String tableName = element.getKey();
+        graphToSQLTableDetail.setTableName(tableName);
         List<String> pks = new ArrayList<>();
-        pks.add(element.getValue().get(0).getKey() + "_" + element.getValue().get(1).getKey());
+        pks.add(tableName);
         graphToSQLTableDetail.setPk(pks);
         Map<String, Object> columnAndType = new HashMap<>();
-        Map<String, Object> remove1 = allRelationshipsProperties.remove(element.getKey());
+        Map<String, Object> remove1 = allRelationshipsProperties.remove(tableName);
         if (remove1 != null) {
             columnAndType.putAll(remove1);
         }
         graphToSQLTableDetail.setColumnsAndTypes(columnAndType);
-        List<Map.Entry<String, String>> remove = foreignKeys.remove(element.getKey());
+        List<Map.Entry<String, String>> remove = foreignKeys.remove(tableName);
         if (remove == null) {
             graphToSQLTableDetail.setGraphFks(new ArrayList<>());
         } else {
@@ -85,7 +86,7 @@ public class SQLSchemaCreator {
         graphToSQLTableDetails.add(graphToSQLTableDetail);
     }
 
-    private void decideWhichTableShouldHaveForeignKey(Map<String, List<Map.Entry<String, String>>> foreignKeys, Map.Entry<MyRelationshipType, List<MyRelationship>> relationshipGroup, Map<String, Map<String, Object>> allRelationshipsProperties) {
+    private void decideWhichTableShouldHaveForeignKey(Map<String, List<Map.Entry<String, String>>> foreignKeys, Map.Entry<MyRelationshipType, List<MyRelationship>> relationshipGroup, Map<String, Map<String, Object>> allRelationshipsProperties, Map<String, Map<Long, MyNode>> allMyNodes) {
 
         MyRelationshipType key = relationshipGroup.getKey();
         Set<Long> firstNodesIds = new HashSet<>();
@@ -93,13 +94,9 @@ public class SQLSchemaCreator {
         List<MyRelationship> value = relationshipGroup.getValue();
 
         Map<String, Object> relationshipProperties = new HashMap<>();
-        for (MyRelationship myRelationship : value) {
-            firstNodesIds.add(myRelationship.getFirstNode());
-            secondNodesIds.add(myRelationship.getSecondNode());
-            relationshipProperties.putAll(myRelationship.getValues());
-        }
+        countNodesInRelationships(firstNodesIds, secondNodesIds, value, relationshipProperties,allMyNodes,key);
 
-        if (firstNodesIds.size() < value.size() && secondNodesIds.size() < value.size() || relationshipProperties.size()>0 ) {
+        if ((firstNodesIds.size() < value.size() && secondNodesIds.size() < value.size()) || relationshipProperties.size()>0 ) {
             List<Map.Entry<String, String>> bothForeignKeys = new ArrayList<>();
             if(key.getFirstNodeLabel().equals(key.getSecondNodeLabel())) {
                 bothForeignKeys.add(new AbstractMap.SimpleEntry<>(key.getFirstNodeLabel(), "1_" + key.getLabel()));
@@ -108,9 +105,10 @@ public class SQLSchemaCreator {
                 bothForeignKeys.add(new AbstractMap.SimpleEntry<>(key.getFirstNodeLabel(), key.getLabel()));
                 bothForeignKeys.add(new AbstractMap.SimpleEntry<>(key.getSecondNodeLabel(), key.getLabel()));
             }
-            foreignKeys.computeIfAbsent(key.getLabel(),
+            String tableName = key.getFirstNodeLabel() + "_" +key.getLabel() +"_" +key.getSecondNodeLabel();
+            foreignKeys.computeIfAbsent(tableName,
                     k -> new ArrayList<>()).addAll(bothForeignKeys);
-            allRelationshipsProperties.computeIfAbsent(key.getLabel(),
+            allRelationshipsProperties.computeIfAbsent(tableName,
                     k -> new HashMap<>()).putAll(relationshipProperties);
             key.setFirstNodeForeignKey(true);
             key.setSecondNodeForeignKey(true);
@@ -122,6 +120,21 @@ public class SQLSchemaCreator {
             foreignKeys.computeIfAbsent(key.getFirstNodeLabel(), k -> new ArrayList<>()).add(new AbstractMap.SimpleEntry<>(key.getSecondNodeLabel(), key.getLabel()));
             allRelationshipsProperties.computeIfAbsent(key.getFirstNodeLabel(), k -> new HashMap<>()).putAll(relationshipProperties);
             key.setSecondNodeForeignKey(true);
+        }
+    }
+
+    private void countNodesInRelationships(Set<Long> firstNodesIds, Set<Long> secondNodesIds, List<MyRelationship> value, Map<String, Object> relationshipProperties, Map<String, Map<Long, MyNode>> allMyNodes, MyRelationshipType key) {
+        for (MyRelationship myRelationship : value) {
+            if(allMyNodes.get(key.getFirstNodeLabel()).containsKey(myRelationship.getFirstNode())) {
+                myRelationship.setDirectionSameAsInType(true);
+                firstNodesIds.add(myRelationship.getFirstNode());
+                secondNodesIds.add(myRelationship.getSecondNode());
+            } else {
+                myRelationship.setDirectionSameAsInType(false);
+                firstNodesIds.add(myRelationship.getSecondNode());
+                secondNodesIds.add(myRelationship.getFirstNode());
+            }
+            relationshipProperties.putAll(myRelationship.getValues());
         }
     }
 }

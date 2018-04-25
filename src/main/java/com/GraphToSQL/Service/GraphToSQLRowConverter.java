@@ -44,7 +44,7 @@ public class GraphToSQLRowConverter {
                 List<MyNode> firstAndSecondNode = getFirstAndSecondNode(allMyNodes, key, myRelationship);
                 TableRow tableRow;
                 tableRow = assignForeignKeysInJunctionTable(key, firstAndSecondNode.get(0), firstAndSecondNode.get(1), myRelationship);
-                allRows.computeIfAbsent(key.getFirstNodeLabel()+"_"+key.getSecondNodeLabel(), k -> new HashMap<>()).put(tableRow.hashCode(), tableRow);
+                allRows.computeIfAbsent(key.getFirstNodeLabel()+"_"+key.getLabel()+"_"+key.getSecondNodeLabel(), k -> new HashMap<>()).put(tableRow.hashCode(), tableRow);
             }
         } else if (key.isFirstNodeForeignKey()) {
             for (MyRelationship myRelationship : element.getValue()) {
@@ -63,12 +63,12 @@ public class GraphToSQLRowConverter {
     private List<MyNode> getFirstAndSecondNode(Map<String, Map<Long, MyNode>> allMyNodes, MyRelationshipType key, MyRelationship myRelationship ) {
         MyNode firstNode;
         MyNode secondNode;
-        firstNode = allMyNodes.get(key.getFirstNodeLabel()).get(myRelationship.getFirstNode());
-        if(firstNode == null) {
+        if(myRelationship.isDirectionSameAsInType()) {
+            firstNode = allMyNodes.get(key.getFirstNodeLabel()).get(myRelationship.getFirstNode());
+            secondNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getSecondNode());
+        } else {
             firstNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getFirstNode());
             secondNode = allMyNodes.get(key.getFirstNodeLabel()).get(myRelationship.getSecondNode());
-        } else {
-            secondNode = allMyNodes.get(key.getSecondNodeLabel()).get(myRelationship.getSecondNode());
         }
         List<MyNode> nodes = new ArrayList<>();
         nodes.add(firstNode);
@@ -88,6 +88,11 @@ public class GraphToSQLRowConverter {
     }
 
     private TableRow assignForeignKeysInJunctionTable(MyRelationshipType key, MyNode firstNode, MyNode secondNode, MyRelationship myRelationship) {
+        if(!myRelationship.isDirectionSameAsInType()) {
+            MyNode temp = secondNode;
+            secondNode = firstNode;
+            firstNode = temp;
+        }
         TableRow tableRow;
         tableRow = new TableRow();
         Map<String, Integer> foreignKeys = new HashMap<>();
@@ -105,6 +110,11 @@ public class GraphToSQLRowConverter {
     }
 
     private void createRowWithOneForeignKey(Map<String, Map<Integer, TableRow>> allRows, String firstNodeLabel, MyNode firstNode, MyNode secondNode, MyRelationship myRelationship, MyRelationshipType key, String secondNodeLabel) {
+        if(!myRelationship.isDirectionSameAsInType()) {
+            MyNode temp = secondNode;
+            secondNode = firstNode;
+            firstNode = temp;
+        }
         TableRow tableRow = allRows.get(firstNodeLabel).get(firstNode.getSqlID());
         tableRow.getForeignKeys().put(key.getLabel() + "_" + secondNodeLabel, secondNode.getSqlID());
         Map<String, Object> relationshipProperties = tableRow.getRelationshipProperties();
@@ -113,10 +123,10 @@ public class GraphToSQLRowConverter {
         allRows.computeIfAbsent(firstNodeLabel, k -> new HashMap<>()).put(firstNode.getSqlID(), tableRow);
     }
 
-    private Map<String, Map<Integer, TableRow>> initializeAllOriginalTables(Map<String, Map<Long, MyNode>> nodesWithoutAnyForeignKeys) {
+    private Map<String, Map<Integer, TableRow>> initializeAllOriginalTables(Map<String, Map<Long, MyNode>> allNodes) {
 
         Map<String, Map<Integer, TableRow>> allRows = new HashMap<>();
-        for (Map.Entry<String, Map<Long, MyNode>> element : nodesWithoutAnyForeignKeys.entrySet()) {
+        for (Map.Entry<String, Map<Long, MyNode>> element : allNodes.entrySet()) {
             for (MyNode myNode : element.getValue().values()) {
                 TableRow tableRow = new TableRow();
                 tableRow.setMyNode(myNode);

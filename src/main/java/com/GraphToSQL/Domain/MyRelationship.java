@@ -25,7 +25,16 @@ public class MyRelationship {
         return values;
     }
 
+    public boolean isDirectionSameAsInType() {
+        return isDirectionSameAsInType;
+    }
+
+    public void setDirectionSameAsInType(boolean directionSameAsInType) {
+        this.isDirectionSameAsInType = directionSameAsInType;
+    }
+
     private long firstNode;
     private long secondNode;
     private Map<String, Object> values;
+    private boolean isDirectionSameAsInType;
 }
